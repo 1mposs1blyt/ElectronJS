@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html data-theme="vscode">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Bot manager</title>
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="script-src 'self' 'unsafe-inline';"
+    />
+    <link rel="stylesheet" href="./src/css/output.css" />
+    <script src="./node_modules/flyonui/flyonui.js"></script>
+  </head>
+  <body class="">
+    <div
+      class="custom-title-bar absolute -top-1 left-0 h-10 w-full pr-0 text-white flex flex-row justify-between items-center select-none"
+    >
+      <button class="btn btn-soft btn-secondary pt-1" id="close-settings">
+        <span class="icon-[tabler--settings] size-5"></span>
+      </button>
+      <div class="join">
+        <input
+          value="—"
+          type="button"
+          id="btn-minimize"
+          class="btn btn-soft btn-success join-item w-14 pt-1 pb-0.5"
+        />
+        <input
+          value="▭"
+          type="button"
+          id="btn-maximize"
+          class="btn btn-soft btn-warning join-item w-14 pt-1 pb-0.5"
+        />
+        <input
+          type="button"
+          id="btn-close"
+          value="✕"
+          class="btn btn-soft btn-error join-item w-14 pt-1 pb-0.5"
+        />
+      </div>
+    </div>
+    <div
+      id="bot-edit-info"
+      class="flex items-center flex-col justify-evenly mt-12 m-4"
+    >
+      <div class="mb-3">Добавление ботов</div>
+      <div
+        class="skeleton-striped w-full min-h-36 h-36 flex items-center flex-row select-none rounded-xl mb-3"
+      >
+        <div class="ml-4">
+          <img
+            class="h-18 w-18 rounded-full ml-4"
+            src="./images/icon2.png"
+            alt="${data[i].avatar}"
+          />
+        </div>
+        <div class="ml-4 mr-4">
+          <div class="text-primary mb-4" id="bot-name">
+            <span class="text-primary" id="inactive">Bot token:</span>
+            <input
+              type="text"
+              placeholder="Токен телеграм бота"
+              class="input max-w-sm"
+            />
+          </div>
+          <div class="text-secondary mb-4">
+            <button id="AddBot" class="btn btn-primary w-full">Добавить</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+  <script src="./src/js/renderer2.js"></script>
+</html>

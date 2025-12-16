@@ -6,16 +6,18 @@ const {
   Tray,
   Menu,
 } = require("electron/main");
+const { event } = require("jquery");
 const path = require("node:path");
-
+const { db, dbPath } = require("./src/js/databases");
 let tray = null;
 let win;
+// let db;
 
 const createWindow = () => {
   const primaryDisplay = screen.getPrimaryDisplay();
   const { width: screenWidth, height: screenHeight } =
     primaryDisplay.workAreaSize;
-  const windowWidth = 950; //400;
+  const windowWidth = 400; //950;
   const windowHeight = 600;
   const x_pos = screenWidth - windowWidth;
   const y_pos = screenHeight - windowHeight;
@@ -92,21 +94,40 @@ const createWindow = () => {
     }
   });
   ipcMain.on("open-settings-window", () => {
-    win.loadFile(path.join(__dirname, "page2.html"));
+    win.loadFile(path.join(__dirname, "settings.html"));
     // смена странички
   });
   ipcMain.on("close-settings-window", () => {
     win.loadFile(path.join(__dirname, "index.html"));
     // смена странички
   });
-
-  // win.webContents.openDevTools(); //открыть девтулс //
-  // win.loadFile(path.join(__dirname, "index.html"));
-
-  win.webContents.openDevTools();
+  ipcMain.on("load-all-bots", (event) => {
+    db.all("SELECT * FROM bots", [], (err, rows) => {
+      if (err) {
+        console.log(err);
+        event.reply("bots-loaded", { error: err.message });
+        return;
+      }
+      event.reply("bots-loaded", rows);
+      console.log("Data from table bots:");
+      console.log(rows);
+    });
+    console.log("bot loading");
+  });
+  ipcMain.on("add-bot-list", (event, data, err) => {
+    console.log(data);
+    // Сделать добавление бота в БД с привязкой к пользователю
+    console.log("!!!FINE!!!");
+    if (err) {
+      event.reply("bot-added", { error: err.message });
+    } else {
+      event.reply("bot-added", "success");
+    }
+  });
+  // win.webContents.openDevTools();
 };
-
 app.whenReady().then(() => {
+  // db = require("./src/js/databases");
   createWindow();
   win.loadFile(path.join(__dirname, "index.html"));
   app.on("activate", () => {
