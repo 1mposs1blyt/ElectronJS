@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html data-theme="vscode">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Bot manager</title>
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="script-src 'self' 'unsafe-inline';"
+    />
+    <link rel="stylesheet" href="./src/css/output.css" />
+    <script src="./node_modules/flyonui/flyonui.js"></script>
+  </head>
+  <body class="overflow-y-hidden">
+    <div
+      class="custom-title-bar absolute -top-1 left-0 h-10 w-full pr-0 text-white flex flex-row justify-between items-center select-none"
+    >
+      <!-- pl-2.5 -->
+      <button class="btn btn-soft btn-primary pt-1" id="open-settings">
+        <span class="icon-[tabler--settings] size-5"></span>
+      </button>
+      <div class="join">
+        <input
+          value="—"
+          type="button"
+          id="btn-minimize"
+          class="btn btn-soft btn-success join-item w-14 pt-1 pb-0.5"
+        />
+        <input
+          value="▭"
+          type="button"
+          id="btn-maximize"
+          class="btn btn-soft btn-warning join-item w-14 pt-1 pb-0.5"
+        />
+        <input
+          type="button"
+          id="btn-close"
+          value="✕"
+          class="btn btn-soft btn-error join-item w-14 pt-1 pb-0.5"
+        />
+      </div>
+    </div>
+    <div
+      id="bot-list"
+      class="flex items-center flex-col justify-evenly mt-12 mb-4 h-[92dvh] m-4 overflow-y-scroll hide-scrollbar"
+    >
+      <!-- <div class="mb-3">Список ботов:</div> h-144-->
+    </div>
+  </body>
+  <script src="./src/js/renderer.js"></script>
+</html>

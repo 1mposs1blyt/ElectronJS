@@ -1,0 +1,50 @@
+[
+  {
+    "bot_token": "XXXXX",
+    "bot_name": "Телеграм ботик №1",
+    "username": "@username1",
+    "status": "active",
+    "avatar": "/images/icon.png",
+    "bot_socket_id":"xxxx"
+  },
+  {
+    "bot_token": "YYYYY",
+    "bot_name": "Телеграм ботик №2",
+    "username": "@username2",
+    "status": "inactive",
+    "avatar": "/images/icon.png",
+    "bot_socket_id":"xxxx"
+  },
+  {
+    "bot_token": "ZZZZZ",
+    "bot_name": "Телеграм ботик №3",
+    "username": "@username3",
+    "status": "active",
+    "avatar": "/images/icon.png",
+    "bot_socket_id":"xxxx"
+  },
+  {
+    "bot_token": "QQQQQ",
+    "bot_name": "Телеграм ботик №4",
+    "username": "@username4",
+    "status": "inactive",
+    "avatar": "/images/icon.png",
+    "bot_socket_id":"xxxx"
+  },
+  {
+    "bot_token": "FFFFFF",
+    "bot_name": "Телеграм ботик №5",
+    "username": "@username5",
+    "status": "inactive",
+    "avatar": "/images/icon.png",
+    "bot_socket_id":"xxxx"
+  },
+  {
+    "bot_token": "HHHHHHH",
+    "bot_name": "Телеграм ботик №6",
+    "username": "@username6",
+    "status": "inactive",
+    "avatar": "/images/icon.png",
+    "bot_socket_id":"xxxx"
+  }
+]
