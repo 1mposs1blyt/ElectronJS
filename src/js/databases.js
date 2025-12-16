@@ -40,7 +40,7 @@ function initializeDatabase() {
         token TEXT,
         name TEXT,
         username TEXT,
-        status TEXT,
+        status TEXT DEFAULT inactive,
         avatar TEXT,
         socket_id TEXT,
         FOREIGN KEY (user_id) REFERENCES users(id)

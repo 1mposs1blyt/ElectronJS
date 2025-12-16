@@ -116,13 +116,24 @@ const createWindow = () => {
   });
   ipcMain.on("add-bot-list", (event, data, err) => {
     console.log(data);
-    // Сделать добавление бота в БД с привязкой к пользователю
-    console.log("!!!FINE!!!");
-    if (err) {
-      event.reply("bot-added", { error: err.message });
-    } else {
-      event.reply("bot-added", "success");
-    }
+    const cb_data = data;
+    db.run(`INSERT INTO bots (token) VALUES (?)`, [cb_data], (err) => {
+      // Должно связываться через WebSockets с ботом и из него отправлять сюда
+      //  все данные бота такие как:
+      // user_id INTEGER,
+      // token TEXT, -- Уже добавляется
+      // name TEXT,
+      // username TEXT,
+      // status TEXT,
+      // avatar TEXT,
+      // socket_id TEXT,
+      console.log("!!!FINE!!!");
+      if (err) {
+        event.reply("bot-added", { error: err.message });
+      } else {
+        event.reply("bot-added", cb_data);
+      }
+    });
   });
   // win.webContents.openDevTools();
 };
