@@ -9,6 +9,7 @@ const {
 const { event } = require("jquery");
 const path = require("node:path");
 const { db, dbPath } = require("./src/js/databases");
+
 let tray = null;
 let win;
 // let db;
@@ -102,6 +103,13 @@ const createWindow = () => {
     // смена странички
   });
   ipcMain.on("load-all-bots", (event) => {
+    db.run(`
+      INSERT INTO users (name)
+      SELECT 'alexandr'
+      WHERE NOT EXISTS (
+        SELECT 1 FROM users WHERE name = 'alexandr'
+      );
+      `);
     db.all("SELECT * FROM bots", [], (err, rows) => {
       if (err) {
         console.log(err);
@@ -116,26 +124,56 @@ const createWindow = () => {
   });
   ipcMain.on("add-bot-list", (event, data, err) => {
     console.log(data);
-    const cb_data = data;
-    db.run(`INSERT INTO bots (token) VALUES (?)`, [cb_data], (err) => {
-      // Должно связываться через WebSockets с ботом и из него отправлять сюда
-      //  все данные бота такие как:
-      // user_id INTEGER,
-      // token TEXT, -- Уже добавляется
-      // name TEXT,
-      // username TEXT,
-      // status TEXT,
-      // avatar TEXT,
-      // socket_id TEXT,
-      console.log("!!!FINE!!!");
-      if (err) {
-        event.reply("bot-added", { error: err.message });
-      } else {
-        event.reply("bot-added", cb_data);
-      }
-    });
+    const token = data;
+    const apiUrl = `https://api.telegram.org/bot${token}/getMe`;
+    let botinfo = [];
+    fetch(apiUrl)
+      .then((response) => {
+        if (!response.ok) {
+          // A non-ok response status (e.g., 401 Unauthorized for invalid token)
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+      })
+      .then((data) => {
+        if (data.ok) {
+          db.run(
+            `INSERT INTO bots (token,user_id,name,username,id) VALUES (?,?,?,?,?)`,
+            [
+              token,
+              1,
+              data.result.first_name,
+              data.result.username,
+              data.result.id,
+            ],
+            (err) => {
+              // Должно связываться через WebSockets с ботом и из него отправлять сюда
+              //  все данные бота такие как:
+              // user_id INTEGER,
+              // token TEXT, -- Уже добавляется
+              // name TEXT,
+              // username TEXT,
+              // status TEXT,
+              // avatar TEXT,
+              // socket_id TEXT,
+              console.log("!!!FINE!!!");
+              if (err) {
+                event.reply("bot-added", { error: err.message });
+              } else {
+                event.reply("bot-added", token);
+              }
+            }
+          );
+          console.log("Bot Information:", data.result);
+        } else {
+          console.error("Telegram API Error:", data.description);
+        }
+      })
+      .catch((error) => {
+        console.error("Error fetching bot information:", error.message);
+      });
   });
-  // win.webContents.openDevTools();
+  win.webContents.openDevTools();
 };
 app.whenReady().then(() => {
   // db = require("./src/js/databases");

@@ -6,27 +6,14 @@ const { app } = require("electron");
 const appDataPath = path.join(app.getPath("userData"), "data");
 const dbPath = path.join(appDataPath, "databases.db");
 
-function initializeDataDirectory() {
+async function initializeDataDirectory() {
   if (!fs.existsSync(appDataPath)) {
     fs.mkdirSync(appDataPath, { recursive: true });
     console.log("Data directory created:", appDataPath);
   }
 }
 
-app.on("ready", () => {
-  initializeDataDirectory();
-  initializeDatabase();
-});
-
-const db = new sqlite3.Database(dbPath, (err) => {
-  if (err) {
-    console.error("Database connection error:", err.message);
-  } else {
-    console.log("Connected to database:", dbPath);
-  }
-});
-
-function initializeDatabase() {
+async function initializeDatabase() {
   db.serialize(() => {
     db.run(`
       CREATE TABLE IF NOT EXISTS users (
@@ -48,5 +35,19 @@ function initializeDatabase() {
     console.log("Database initialized");
   });
 }
+
+app.on("ready", async () => {
+  initializeDataDirectory().then(() => {
+    initializeDatabase();
+  });
+});
+
+const db = new sqlite3.Database(dbPath, (err) => {
+  if (err) {
+    console.error("Database connection error:", err.message);
+  } else {
+    console.log("Connected to database:", dbPath);
+  }
+});
 
 module.exports = { db, dbPath };

@@ -33,9 +33,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                 />
               </div>
               <div class="ml-4">
-                <div class="text-primary" id="bot-name">${
-                  data[i].name
-                }</div>
+                <div class="text-primary" id="bot-name">${data[i].name}</div>
                 <div id="bot-status" class="text-secondary">
                   Статус:
                   ${
@@ -44,7 +42,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                       : '<span class="text-error" id="inactive">Неактивен</span>'
                   }
                 </div>
-                <div class="text-info">${data[i].username}</div>
+                <div class="text-info">@${data[i].username}</div>
               </div>
             </div>
           `);
@@ -52,3 +50,97 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   });
 });
+// Указываем адрес нашего сервера, который мы запустили на порту 3000
+const socket = io("http://localhost:3000");
+// const socket = io();
+const logs = [];
+const bots = new Map();
+
+function addLog(message, type = "update") {
+  logs.unshift(`[${new Date().toLocaleTimeString()}] ${message}`);
+  if (logs.length > 100) logs.pop();
+
+  const logsDiv = document.getElementById("logs");
+  // logsDiv.innerHTML = logs
+    // .map((log) => `<div class="log-entry ${type}">${log}</div>`)
+    // .join("");
+}
+
+function updateBotsList() {
+  // const botsDiv = document.getElementById("bots");
+  if (bots.size === 0) {
+    // botsDiv.innerHTML = "<p>Нет активных ботов</p>";
+    return;
+  }
+
+  botsDiv.innerHTML = Array.from(bots.values())
+    .map(
+      (bot) =>
+        `<div class="bot-item ${bot.status === "offline" ? "offline" : ""}">
+          <span class="online-indicator ${
+            bot.status === "offline" ? "offline" : ""
+          }"></span>
+          <strong>@${bot.username}</strong> (${bot.botName})
+          <span class="bot-status ${
+            bot.status
+          }">${bot.status.toUpperCase()}</span>
+          <p style="font-size: 12px; margin-top: 5px; color: #888;">Uptime: ${
+            bot.uptime
+          }s</p>
+        </div>`
+    )
+    .join("");
+}
+
+socket.on("connect", () => {
+  addLog("✓ Подключено к серверу", "bot");
+});
+
+socket.on("bot-connected", (data) => {
+  bots.set(data.botId, {
+    botId: data.botId,
+    botName: data.botName,
+    username: data.username,
+    status: "online",
+    uptime: 0,
+    startTime: Date.now(),
+  });
+  document.getElementById("bot-count").textContent = bots.size;
+  addLog(`✓ Бот подключился: @${data.username}`, "bot");
+  updateBotsList();
+});
+
+socket.on("bot-disconnected", (data) => {
+  bots.delete(data.botId);
+  document.getElementById("bot-count").textContent = bots.size;
+  addLog(`✗ Бот отключился: ${data.botName}`, "error");
+  updateBotsList();
+});
+
+socket.on("telegram-update", (data) => {
+  addLog(`[${data.botName}] ${data.username}: ${data.message}`, "update");
+});
+
+socket.on("client-connected", (data) => {
+  document.getElementById("client-count").textContent = data.totalClients;
+  addLog(`✓ Клиент подключился: ${data.name}`, "bot");
+});
+
+socket.on("client-disconnected", (data) => {
+  document.getElementById("client-count").textContent = data.totalClients;
+  addLog(`✗ Клиент отключился: ${data.name}`, "error");
+});
+
+socket.on("bot-error", (data) => {
+  addLog(`✗ Ошибка в ${data.botName}: ${data.error}`, "error");
+});
+
+// Обновляем uptime каждую секунду
+setInterval(() => {
+  bots.forEach((bot) => {
+    bot.uptime = Math.floor((Date.now() - bot.startTime) / 1000);
+  });
+  updateBotsList();
+}, 1000);
+
+addLog("Dashboard загружен", "bot");

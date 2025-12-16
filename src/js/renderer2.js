@@ -16,12 +16,15 @@ document.getElementById("btn-maximize").addEventListener("click", () => {
 document.getElementById("close-settings").addEventListener("click", () => {
   ipcRenderer.send("close-settings-window");
 });
+
 document.getElementById("add_bot").addEventListener("click", () => {
-  const bot_token = $("#bot_token").val();//"bot_token21312312" //doc.getelementbyid...
+  const bot_token = $("#bot_token").val();
+  //"bot_token21312312" //doc.getelementbyid...
   ipcRenderer.send("add-bot-list", bot_token);
   ipcRenderer.on("bot-added", (event, data) => {
-    alert(data);
+    // alert(data);
     console.log(data);
+    document.getElementById("bot_token").value = "";
   });
 });
 document.addEventListener("DOMContentLoaded", async () => {
