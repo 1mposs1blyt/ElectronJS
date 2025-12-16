@@ -12,11 +12,9 @@ document.getElementById("btn-minimize").addEventListener("click", () => {
 document.getElementById("btn-maximize").addEventListener("click", () => {
   ipcRenderer.send("maximize-app");
 });
-
 document.getElementById("close-settings").addEventListener("click", () => {
   ipcRenderer.send("close-settings-window");
 });
-
 document.getElementById("add_bot").addEventListener("click", () => {
   const bot_token = $("#bot_token").val();
   //"bot_token21312312" //doc.getelementbyid...

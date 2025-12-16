@@ -31,14 +31,15 @@ bot.use(async (ctx, next) => {
   const message = ctx.message?.text || `[${ctx.updateType}]`;
   console.log(`[${BOT_NAME}] ${ctx.from.username || ctx.from.id}: ${message}`);
 
-  socket.emit("bot-update", {
-    botId: BOT_ID,
-    botName: BOT_NAME,
-    username: ctx.from.username || `User${ctx.from.id}`,
-    message: message,
-    userId: ctx.from.id,
+  bot.telegram.getMe().then((me) => {
+    socket.emit("bot-update", {
+      botId: me.id,
+      botName: BOT_NAME,
+      username: ctx.from.username || `User${ctx.from.id}`,
+      message: message,
+      userId: ctx.from.id,
+    });
   });
-
   await next();
 });
 

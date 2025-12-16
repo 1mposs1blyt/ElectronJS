@@ -22,10 +22,26 @@ const botSessions = new Map();
 const connectedClients = new Map();
 
 // ============ SOCKET.IO EVENTS ============
+io.on('connection', (socket) => {
+  console.log('[SERVER] client connected', socket.id);
 
+  socket.on('bot-register', (data) => {
+    console.log('[SERVER] bot-register', data);
+    io.emit('bot-register', data);
+  });
+
+  socket.on('bot-update', (data) => {
+    console.log('[SERVER] bot-update', data);
+    io.emit('bot-update', data);
+  });
+
+  socket.on('bot-disconnected', (data) => {
+    console.log('[SERVER] bot-disconnected', data);
+    io.emit('bot-disconnected', data);
+  });
+});
 io.on("connection", (socket) => {
   console.log(`[Socket] Клиент подключился: ${socket.id}`);
-
   // Регистрация клиента
   socket.on("register", (data) => {
     connectedClients.set(socket.id, {

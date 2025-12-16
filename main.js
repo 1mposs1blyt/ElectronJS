@@ -6,12 +6,13 @@ const {
   Tray,
   Menu,
 } = require("electron/main");
-const { event } = require("jquery");
 const path = require("node:path");
 const { db, dbPath } = require("./src/js/databases");
-
+const { io: ioClient } = require("socket.io-client");
 let tray = null;
 let win;
+let socket;
+
 // let db;
 
 const createWindow = () => {
@@ -112,6 +113,7 @@ const createWindow = () => {
       `);
     db.all("SELECT * FROM bots", [], (err, rows) => {
       if (err) {
+        ``;
         console.log(err);
         event.reply("bots-loaded", { error: err.message });
         return;
@@ -173,17 +175,59 @@ const createWindow = () => {
         console.error("Error fetching bot information:", error.message);
       });
   });
+  ipcMain.handle("get-server-status", async () => {
+    return new Promise((resolve) => {
+      socket.emit("get-status");
+      socket.once("server-status", (data) => resolve(data));
+    });
+  });
+  ipcMain.on("update-bot-status", (event, data, err) => {
+    console.log(data);
+    db.run(
+      `UPDATE bots SET status = ? WHERE id = ?`,
+      ["active", data],
+      (err) => {
+        // console.log("!!!FINE!!!");
+        if (err) {
+          event.reply("bot-status-updated", { error: err.message });
+        } else {
+          event.reply("bot-status-updated", data);
+        }
+      }
+    );
+  });
   win.webContents.openDevTools();
 };
 app.whenReady().then(() => {
-  // db = require("./src/js/databases");
+  socket = ioClient("http://localhost:3000", {
+    reconnection: true,
+    reconnectionDelay: 1000,
+    reconnectionDelayMax: 5000,
+  });
+  socket.on("connect", () => {
+    console.log("+ Electron connected to sockets");
+
+    socket.emit("register", {
+      type: "electron", // ← Тип клиента
+      clientId: "electron-app",
+      name: "Bot Manager (Electron)",
+    });
+  });
+  socket.on("telegram-update", (data) => {
+    console.log(`Update from bot: ${data.botName}`);
+    win.webContents.send("bot-update", data);
+  });
+  socket.on("command-executed", (data) => {
+    console.log(`Comman executes: ${data.command}`);
+    win.webContents.send("command-result", data);
+  });
   createWindow();
   win.loadFile(path.join(__dirname, "index.html"));
-  app.on("activate", () => {
-    if (BrowserWindow.getAllWindows().length === 0) {
-      createWindow();
-    }
-  });
+  // app.on("activate", () => {
+  //   if (BrowserWindow.getAllWindows().length === 0) {
+  //     createWindow();
+  //   }
+  // });
 });
 
 app.on("window-all-closed", () => {
