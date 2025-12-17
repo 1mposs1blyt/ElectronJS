@@ -18,19 +18,30 @@ document.getElementById("close-settings").addEventListener("click", () => {
 document.getElementById("add_bot").addEventListener("click", () => {
   const bot_token = $("#bot_token").val();
   const bot_folder = $("#bot_folder").val();
-  //"bot_token21312312" //doc.getelementbyid...
+  const bot_ssh_host = $("#bot_ssh_host").val();
+  const bot_ssh_username = $("#bot_ssh_username").val();
+  const bot_ssh_password = $("#bot_ssh_password").val();
+  const bot_ssh_privateKey = $("#bot_ssh_botDir").val();
+  const bot_ssh_bot_dir = $("#bot_ssh_bot_dir").val();
+  const bot_ssh_bot_name = $("#bot_ssh_bot_name").val();
   ipcRenderer.send("add-bot-list", {
     bot_token: bot_token,
     bot_folder: bot_folder,
+    bot_ssh_host: bot_ssh_host,
+    bot_ssh_username: bot_ssh_username,
+    bot_ssh_password: bot_ssh_password,
+    bot_ssh_privateKey: bot_ssh_privateKey,
+    bot_ssh_bot_dir: bot_ssh_bot_dir,
+    bot_ssh_bot_name: bot_ssh_bot_name,
   });
   ipcRenderer.on("bot-added", (event, data, err) => {
     // alert(data);
     console.log(data);
     document.getElementById("bot_token").value = "";
-    document.getElementById("bot_folder").value = "";
+    // document.getElementById("bot_folder").value = "";
   });
   document.getElementById("bot_token").value = "";
-  document.getElementById("bot_folder").value = "";
+  // document.getElementById("bot_folder").value = "";
 });
 document.addEventListener("DOMContentLoaded", async () => {
   // ipcRenderer.send("bot-edit-list");

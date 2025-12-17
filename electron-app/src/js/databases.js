@@ -19,19 +19,35 @@ async function initializeDatabase() {
       CREATE TABLE IF NOT EXISTS users (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         name TEXT NOT NULL
-      )`);
+      )
+    `);
+
     db.run(`
-        CREATE TABLE IF NOT EXISTS bots (
+      CREATE TABLE IF NOT EXISTS bots (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         user_id INTEGER,
         token TEXT,
         name TEXT,
         username TEXT,
-        status TEXT DEFAULT inactive,
+        status TEXT DEFAULT 'inactive',
         avatar TEXT,
         socket_id TEXT,
+        
+        -- SSH данные
+        ssh_host TEXT,
+        ssh_port INTEGER DEFAULT 22,
+        ssh_username TEXT,
+        ssh_password TEXT,
+        ssh_private_key TEXT,
+        
+        -- Пути на сервере
+        bot_dir TEXT,
+        bot_name TEXT,
+        
         FOREIGN KEY (user_id) REFERENCES users(id)
-      )`);
+      )
+    `);
+
     console.log("Database initialized");
   });
 }

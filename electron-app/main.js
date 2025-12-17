@@ -141,6 +141,13 @@ const createWindow = () => {
     console.log(data.bot_token + "\n" + data.bot_folder);
     const token = data.bot_token;
     const folder = data.bot_folder;
+    const bot_ssh_host = data.bot_ssh_host;
+    const bot_ssh_port = data.bot_ssh_port || 22;
+    const bot_ssh_username = data.bot_ssh_username;
+    const bot_ssh_password = data.bot_ssh_password;
+    const bot_ssh_privateKey = data.bot_ssh_privateKey || "";
+    const bot_ssh_bot_dir = data.bot_ssh_bot_dir;
+    const bot_ssh_bot_name = data.bot_ssh_bot_name || "bot";
     const apiUrl = `https://api.telegram.org/bot${token}/getMe`;
     let botinfo = [];
     fetch(apiUrl)
@@ -154,14 +161,22 @@ const createWindow = () => {
       .then((data) => {
         if (data.ok) {
           db.run(
-            `INSERT INTO bots (token,user_id,name,username,id,avatar) VALUES (?,?,?,?,?,?)`,
+            `INSERT INTO bots (token,user_id,name,username,id,
+            ssh_host,ssh_port,ssh_username,ssh_password,ssh_private_key,bot_dir,bot_name
+            ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)`,
             [
               token,
               1,
               data.result.first_name,
               data.result.username,
               data.result.id,
-              folder,
+              bot_ssh_host,
+              bot_ssh_port,
+              bot_ssh_username,
+              bot_ssh_password,
+              bot_ssh_privateKey,
+              bot_ssh_bot_dir,
+              bot_ssh_bot_name,
             ],
             (err) => {
               console.log("!!!FINE!!!");
@@ -208,16 +223,109 @@ const createWindow = () => {
     });
   });
   ipcMain.on("get-bot-path", (event, data, err) => {
-    db.get(
-      "SELECT avatar FROM bots WHERE id = ?",
-      [data],
-      (err, rows) => {
-        console.log(rows);
-        event.reply("send-bot-path", rows);
-      }
-    );
+    db.get("SELECT avatar FROM bots WHERE id = ?", [data], (err, rows) => {
+      console.log(rows);
+      event.reply("send-bot-path", rows);
+    });
   });
+  ipcMain.on("get-bot-ssh-config", (event, botId) => {
+    try {
+      // НЕПРАВИЛЬНО (synchronous):
+      // const bot = db.prepare("SELECT * FROM bots WHERE id = ?").get(botId);
 
+      // ПРАВИЛЬНО (асинхронный callback):
+      db.get("SELECT * FROM bots WHERE id = ?", [botId], (err, bot) => {
+        if (err) {
+          console.error("Database error:", err);
+          event.reply("bot-ssh-config", null);
+          return;
+        }
+
+        if (!bot) {
+          console.log("Bot not found:", botId);
+          event.reply("bot-ssh-config", null);
+          return;
+        }
+
+        // Возвращаешь SSH данные и пути бота
+        event.reply("bot-ssh-config", {
+          ssh: {
+            host: bot.ssh_host,
+            port: bot.ssh_port || 22,
+            username: bot.ssh_username,
+            password: bot.ssh_password,
+            privateKey: bot.ssh_private_key,
+          },
+          botDir: bot.bot_dir,
+          botName: bot.bot_name,
+        });
+
+        console.log("[SSH Config] Loaded for bot:", botId);
+      });
+    } catch (e) {
+      console.error("Error getting SSH config:", e);
+      event.reply("bot-ssh-config", null);
+    }
+  });
+  ipcMain.on("add-bot-list-with-ssh", (event, data) => {
+    console.log("Adding bot with SSH config:", data.bot_name);
+
+    const token = data.bot_token;
+    const folder = data.bot_folder;
+    const apiUrl = `https://api.telegram.org/bot${token}/getMe`;
+
+    fetch(apiUrl)
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+      })
+      .then((botData) => {
+        if (botData.ok) {
+          db.run(
+            `INSERT INTO bots (
+            token, user_id, name, username, id, avatar,
+            ssh_host, ssh_port, ssh_username, ssh_password, ssh_private_key,
+            bot_dir, bot_name
+          ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+            [
+              token,
+              1,
+              botData.result.first_name,
+              botData.result.username,
+              botData.result.id,
+              folder,
+              // SSH данные
+              data.ssh_host || "",
+              data.ssh_port || 22,
+              data.ssh_username || "",
+              data.ssh_password || "",
+              data.ssh_private_key || "",
+              // Пути
+              data.bot_dir || "",
+              data.bot_name || botData.result.username,
+            ],
+            (err) => {
+              if (err) {
+                console.error("Insert error:", err);
+                event.reply("bot-added", { error: err.message });
+              } else {
+                console.log("✓ Bot added successfully with SSH config");
+                event.reply("bot-added", { success: true, token });
+              }
+            }
+          );
+        } else {
+          console.error("Telegram API Error:", botData.description);
+          event.reply("bot-added", { error: botData.description });
+        }
+      })
+      .catch((error) => {
+        console.error("Error fetching bot info:", error);
+        event.reply("bot-added", { error: error.message });
+      });
+  });
   win.webContents.openDevTools();
 };
 app.whenReady().then(() => {

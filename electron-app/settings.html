@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html data-theme="vscode">
   <head>
     <meta charset="UTF-8" />
@@ -10,7 +10,7 @@
     <link rel="stylesheet" href="./src/css/output.css" />
     <script src="./node_modules/flyonui/flyonui.js"></script>
   </head>
-  <body class="">
+  <body class="hide-scrollbar overflow-y-hidden">
     <div
       class="custom-title-bar absolute -top-1 left-0 h-10 w-full pr-0 text-white flex flex-row justify-between items-center select-none"
     >
@@ -40,17 +40,17 @@
     </div>
     <div
       id="bot-edit-info"
-      class="flex items-center flex-col justify-evenly mt-12 m-4"
+      class="flex items-center flex-col justify-start mt-12 mb-4 h-[92dvh] m-4 overflow-y-scroll hide-scrollbar"
     >
       <div class="mb-3">Добавление ботов</div>
       <div
-        class="skeleton-striped w-fit min-h-36 flex items-center justify-center flex-row select-none rounded-xl mb-3"
+        class="skeleton-striped w-fit flex items-center justify-center flex-row select-none rounded-xl mb-3"
       >
         <!-- <div class="h-18 w-18 rounded-full ml-4">
           <img class="" src="./images/icon2.png" alt="${data[i].avatar}" />
         </div> -->
         <div class="ml-4 mr-4">
-          <div class="text-primary mb-4 mt-2" id="bot-name">
+          <div class="text-primary mb-4 mt-2">
             <span class="text-primary">Токен бота:</span>
             <input
               type="text"
@@ -59,13 +59,76 @@
               id="bot_token"
             />
           </div>
-          <div class="text-primary mb-4" id="bot-name">
+          <!-- <div class="text-primary mb-4">
             <span class="text-primary">Путь до bot.js файла:</span>
             <input
               type="text"
               placeholder="C:\folder\folder\bot\bot.js"
               class="input max-w-sm"
               id="bot_folder"
+            />
+          </div> -->
+          <div class="text-primary mb-4">
+            <span class="text-primary">SSH: Хост</span>
+            <input
+              type="text"
+              placeholder="Адрес сервера"
+              class="input max-w-sm"
+              id="bot_ssh_host"
+            />
+          </div>
+          <div class="text-primary mb-4">
+            <span class="text-primary">SSH: Порт</span>
+            <input
+              type="text"
+              placeholder="Стандартное значение: 22"
+              class="input max-w-sm"
+              id="bot_ssh_port"
+            />
+          </div>
+          <div class="text-primary mb-4">
+            <span class="text-primary">SSH: Имя пользователя</span>
+            <input
+              type="text"
+              placeholder="Имя пользователя windows"
+              class="input max-w-sm"
+              id="bot_ssh_username"
+            />
+          </div>
+          <div class="text-primary mb-4">
+            <span class="text-primary">SSH: Пароль</span>
+            <input
+              type="text"
+              placeholder="Пароль текущего пользователя windows"
+              class="input max-w-sm"
+              id="bot_ssh_password"
+            />
+          </div>
+          <div class="text-primary mb-4">
+            <span class="text-primary">SSH: Private key</span>
+            <input
+              type="text"
+              placeholder="Адрес сервера"
+              class="input max-w-sm"
+              id="bot_ssh_privateKey"
+            />
+          </div>
+          <div class="text-primary mb-4">
+            <span class="text-primary">SSH: Путь к боту</span>
+            <input
+              type="text"
+              placeholder="Полный путь к папке бота C:\example\MyBot"
+              class="input max-w-sm"
+              id="bot_ssh_bot_dir"
+            />
+          </div>
+          <div class="text-primary mb-4">
+            <span class="text-primary">SSH: Имя файла бота</span>
+            <input
+              type="text"
+              placeholder="MyBot (.js писать не надо)"
+              class="input max-w-sm"
+              id="bot_ssh_bot_name"
             />
           </div>
           <div class="text-secondary mb-4">
