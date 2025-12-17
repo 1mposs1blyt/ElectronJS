@@ -1,5 +1,13 @@
 {
   "devDependencies": {
+    "@electron-forge/cli": "^7.10.2",
+    "@electron-forge/maker-deb": "^7.10.2",
+    "@electron-forge/maker-rpm": "^7.10.2",
+    "@electron-forge/maker-squirrel": "^7.10.2",
+    "@electron-forge/maker-zip": "^7.10.2",
+    "@electron-forge/plugin-auto-unpack-natives": "^7.10.2",
+    "@electron-forge/plugin-fuses": "^7.10.2",
+    "@electron/fuses": "^1.8.0",
     "@iconify/json": "^2.2.418",
     "@iconify/tailwind4": "^1.2.0",
     "electron": "^39.2.7",
@@ -28,6 +36,7 @@
     "define-properties": "^1.2.1",
     "detect-node": "^2.1.0",
     "electron-nunjucks": "^1.0.3",
+    "electron-squirrel-startup": "^1.0.1",
     "end-of-stream": "^1.4.5",
     "env-paths": "^2.2.1",
     "es-define-property": "^1.0.1",
@@ -83,7 +92,9 @@
   },
   "scripts": {
     "start": "electron .",
-    "watch:css": "npx @tailwindcss/cli -i ./src/css/input.css -o ./src/css/output.css --watch"
+    "watch:css": "npx @tailwindcss/cli -i ./src/css/input.css -o ./src/css/output.css --watch",
+    "package": "electron-forge package",
+    "make": "electron-forge make"
   },
   "author": "alexandr",
   "license": "ISC"

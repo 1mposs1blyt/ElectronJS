@@ -30,8 +30,7 @@ function bot_start(el, e) {
   //   .querySelector(".text-info")
   //   .textContent.split("@")[1];
   // console.log("Bot-user-name:", botusername);
-  // ipcRenderer.send("get-bot-path", botusername);
-  // ipcRenderer.on("send-bot-path", (event, data) => {
+
   //   console.log(data.avatar);
   //   const bot_path = data.avatar;
   //   const { spawn } = require("child_process");
@@ -43,7 +42,11 @@ function bot_start(el, e) {
   //   child.unref();
   // });
 
-  let botId = el.dataset.bot_id;
+  const botId = el.dataset.bot_id;
+  ipcRenderer.send("get-bot-path", botId.split("bot_")[1]);
+  ipcRenderer.on("send-bot-path", (event, data) => {
+    console.log(data.avatar);
+  });
   console.log("[RENDERER] Starting bot:", botId);
   socket.emit("start-bot", { botId }, (response) => {
     if (response.success) {
@@ -77,8 +80,14 @@ function renderBots() {
   ipcRenderer.send("load-all-bots");
   ipcRenderer.on("bots-loaded", (event, data) => {
     $("#bot-list").empty();
-    if (data.error) {
-      $("#bot-list").append(`Ошибка: ${data.error}`);
+    if (data.error || data.length == 0) {
+      $("#bot-list").append(
+        `<div class="items-center text-center justify-center flex flex-col align-center">
+        <h1 class="text-primary text-center self-center text-center">Ботов пока нет</h1>
+        <p class="text-secondary">Используй кнопку настроек для добавления</p>
+        </div>
+        `
+      );
     } else {
       for (let i = 0; i < data.length; i++) {
         $("#bot-list").append(`

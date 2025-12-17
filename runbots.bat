@@ -5,7 +5,8 @@ echo Запуск приложений...
 echo.
 
 REM Переменная для пути к проекту (замени на свой путь)
-set PROJECT_PATH=D:\Работа\ПРОЭКТЫ\ElectronJS-1\
+set PROJECT_PATH=C:\Users\alexandr\Desktop\ElectronJS\
+REM D:\Работа\ПРОЭКТЫ\ElectronJS-1\
 
 REM Сервер
 start "Bot Server" cmd /k "cd /d %PROJECT_PATH%\SocketServer && npm start"
@@ -32,7 +33,7 @@ timeout /t 1 /nobreak
 
 
 REM Electron
-start "Electron App" cmd /k "cd /d %PROJECT_PATH% && npm start"
+start "Electron App" cmd /k "cd /d %PROJECT_PATH%\electron-app && npm start"
 
 echo.
 echo ✓ Все приложения запущены!

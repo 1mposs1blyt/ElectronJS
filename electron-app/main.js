@@ -51,7 +51,6 @@ const createWindow = () => {
       // sandbox: true, // ← Рекомендуется добавить
     },
   });
-
   function hideTray() {
     if (tray) {
       tray.destroy();
@@ -210,7 +209,7 @@ const createWindow = () => {
   });
   ipcMain.on("get-bot-path", (event, data, err) => {
     db.get(
-      "SELECT avatar FROM bots WHERE username = ?",
+      "SELECT avatar FROM bots WHERE id = ?",
       [data],
       (err, rows) => {
         console.log(rows);
@@ -247,12 +246,6 @@ app.whenReady().then(() => {
     createWindow();
     win.loadFile(path.join(__dirname, "index.html"));
   });
-
-  // app.on("activate", () => {
-  //   if (BrowserWindow.getAllWindows().length === 0) {
-  //     createWindow();
-  //   }
-  // });
 });
 
 app.on("window-all-closed", () => {
