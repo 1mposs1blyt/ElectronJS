@@ -42,9 +42,43 @@
     </div>
     <div
       id="bot-list"
-      class="flex items-center flex-col justify-evenly mt-12 mb-4 h-[92dvh] m-4 overflow-y-scroll hide-scrollbar"
+      class="flex items-center flex-col justify-start mt-12 mb-4 h-[92dvh] m-4 overflow-y-scroll hide-scrollbar"
     >
-      <!-- <div class="mb-3">Список ботов:</div> h-144-->
+      <div class="mb-3 text-primary">Список ботов:</div>
+      <div
+        class="skeleton-striped w-full min-h-24 h-24 flex items-center flex-row select-none rounded-xl mb-3"
+      >
+        <div class="h-18 w-18 rounded-full ml-4">
+          <img
+            class=""
+            src="./images/icon2.png"
+            alt="${data[i].avatar}"
+          />
+        </div>
+        <div class="ml-4">
+          <div class="text-primary" id="bot-name">bot-name</div>
+          <div id="bot-status" class="text-secondary">
+            Статус: <span class="text-success" id="active">Активен</span>
+          </div>
+          <div class="text-info">@username</div>
+        </div>
+        <div class="ml-auto flex flex-col w-36 mr-2">
+          <button
+            class="bot-stop btn btn-soft btn-success pt-1 mb-2 "
+            onclick="bot_start(this.id)"
+            id="${data[i].socket_id}"
+          >
+            start
+          </button>
+          <button
+            class="bot-stop btn btn-soft btn-error pt-1"
+            onclick="bot_stop(this.id)"
+            id="${data[i].socket_id}"
+          >
+            stop
+          </button>
+        </div>
+      </div>
     </div>
   </body>
   <script src="./src/js/renderer.js"></script>

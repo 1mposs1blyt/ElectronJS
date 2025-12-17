@@ -22,22 +22,99 @@ const botSessions = new Map();
 const connectedClients = new Map();
 
 // ============ SOCKET.IO EVENTS ============
-io.on('connection', (socket) => {
-  console.log('[SERVER] client connected', socket.id);
+io.on("connection", (socket) => {
+  console.log("[SERVER] client connected", socket.id);
 
-  socket.on('bot-register', (data) => {
-    console.log('[SERVER] bot-register', data);
-    io.emit('bot-register', data);
+  socket.on("stop-bot", (data, callback) => {
+    console.log("[SERVER] stop-bot requested for:", data.botId);
+
+    const bot = botSessions.get(data.botId);
+
+    if (!bot) {
+      console.error("Bot not found:", data.botId);
+      console.log("Available bots:", Array.from(botSessions.keys()));
+      callback({ success: false, error: "Bot not found" });
+      return;
+    }
+
+    io.to(bot.socketId).emit("shutdown-signal", {
+      botId: data.botId,
+      reason: "Stop requested from UI",
+    });
+
+    callback({ success: true, message: "Bot is stopping..." });
+  });
+  socket.on("start-bot", (data, callback) => {
+    console.log("Start bot:", data.botId);
+
+    // Если уже работает
+    if (botSessions.has(data.botId)) {
+      callback({ success: false, error: "Bot already running" });
+      return;
+    }
+
+    // Отправляем сигнал боту на запуск
+    socket.emit("start-signal", { botId: data.botId });
+
+    callback({ success: true });
+  });
+  socket.on("bot-timer-update", (data) => {
+    console.log("[SERVER] bot-timer-update", data);
+    io.emit("bot-timer-update", data);
   });
 
-  socket.on('bot-update', (data) => {
-    console.log('[SERVER] bot-update', data);
-    io.emit('bot-update', data);
+  socket.on("bot-register", (data) => {
+    console.log("[SERVER] bot-register", data);
+    io.emit("bot-register", data);
   });
 
-  socket.on('bot-disconnected', (data) => {
-    console.log('[SERVER] bot-disconnected', data);
-    io.emit('bot-disconnected', data);
+  socket.on("bot-update", (data) => {
+    console.log("[SERVER] bot-update", data);
+    io.emit("bot-update", data);
+  });
+
+  socket.on("bot-disconnected", (data) => {
+    console.log("[SERVER] bot-disconnected", data);
+    io.emit("bot-disconnected", data);
+  });
+  socket.on("disconnect", () => {
+    console.log(`[Socket] Клиент отключился: ${socket.id}`);
+
+    // Ищем, какой бот отключился
+    let disconnectedBot = null;
+
+    for (const [botId, bot] of botSessions) {
+      if (bot.socketId === socket.id) {
+        disconnectedBot = bot;
+        botSessions.delete(botId);
+        break;
+      }
+    }
+
+    // Если это был бот — уведомляем всех клиентов
+    if (disconnectedBot) {
+      console.log(`[Bot] Бот отключился: @${disconnectedBot.username}`);
+
+      io.emit("bot-disconnected", {
+        botId: disconnectedBot.botId,
+        botName: disconnectedBot.botName,
+        username: disconnectedBot.username,
+        timestamp: new Date(),
+      });
+    }
+
+    // Если это был обычный клиент (веб/electron)
+    const client = connectedClients.get(socket.id);
+    if (client) {
+      connectedClients.delete(socket.id);
+      console.log(`[Client] Клиент отключился: ${client.name}`);
+
+      io.emit("client-disconnected", {
+        clientId: client.clientId,
+        name: client.name,
+        totalClients: connectedClients.size,
+      });
+    }
   });
 });
 io.on("connection", (socket) => {
@@ -47,6 +124,7 @@ io.on("connection", (socket) => {
     connectedClients.set(socket.id, {
       clientId: data.clientId,
       name: data.name,
+      process: data.process,
     });
 
     io.emit("client-connected", {

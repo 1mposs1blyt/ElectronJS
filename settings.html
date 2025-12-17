@@ -44,23 +44,28 @@
     >
       <div class="mb-3">Добавление ботов</div>
       <div
-        class="skeleton-striped w-full min-h-36 h-36 flex items-center flex-row select-none rounded-xl mb-3"
+        class="skeleton-striped w-fit min-h-36 flex items-center justify-center flex-row select-none rounded-xl mb-3"
       >
-        <div class="ml-4">
-          <img
-            class="h-18 w-18 rounded-full ml-4"
-            src="./images/icon2.png"
-            alt="${data[i].avatar}"
-          />
-        </div>
+        <!-- <div class="h-18 w-18 rounded-full ml-4">
+          <img class="" src="./images/icon2.png" alt="${data[i].avatar}" />
+        </div> -->
         <div class="ml-4 mr-4">
-          <div class="text-primary mb-4" id="bot-name">
-            <span class="text-primary">Bot token:</span>
+          <div class="text-primary mb-4 mt-2" id="bot-name">
+            <span class="text-primary">Токен бота:</span>
             <input
               type="text"
               placeholder="Токен телеграм бота"
               class="input max-w-sm"
               id="bot_token"
+            />
+          </div>
+          <div class="text-primary mb-4" id="bot-name">
+            <span class="text-primary">Путь до bot.js файла:</span>
+            <input
+              type="text"
+              placeholder="C:\folder\folder\bot\bot.js"
+              class="input max-w-sm"
+              id="bot_folder"
             />
           </div>
           <div class="text-secondary mb-4">

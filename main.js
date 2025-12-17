@@ -9,6 +9,19 @@ const {
 const path = require("node:path");
 const { db, dbPath } = require("./src/js/databases");
 const { io: ioClient } = require("socket.io-client");
+const { event } = require("jquery");
+
+// ======================== Запуск socket.io сервера ======================== //
+// const { spawn } = require("child_process");
+// const scriptPath = path.join(__dirname, "/SocketServer/server.js");
+// const child = spawn(process.execPath, [scriptPath], {
+//   detached: true, // Allows the child to run independently of the parent
+//   stdio: "ignore", // Detaches stdio streams
+// });
+// child.unref();
+// Для запуска бота из приложения можно сделать дополнительное поле в котором будет содержаться путь к боту
+// и по аналогии с кодом выше будет запускаться бот
+// ======================== Запуск socket.io сервера ======================== //
 let tray = null;
 let win;
 let socket;
@@ -111,6 +124,7 @@ const createWindow = () => {
         SELECT 1 FROM users WHERE name = 'alexandr'
       );
       `);
+
     db.all("SELECT * FROM bots", [], (err, rows) => {
       if (err) {
         ``;
@@ -120,13 +134,14 @@ const createWindow = () => {
       }
       event.reply("bots-loaded", rows);
       console.log("Data from table bots:");
-      console.log(rows);
+      // console.log(rows);
     });
     console.log("bot loading");
   });
   ipcMain.on("add-bot-list", (event, data, err) => {
-    console.log(data);
-    const token = data;
+    console.log(data.bot_token + "\n" + data.bot_folder);
+    const token = data.bot_token;
+    const folder = data.bot_folder;
     const apiUrl = `https://api.telegram.org/bot${token}/getMe`;
     let botinfo = [];
     fetch(apiUrl)
@@ -140,24 +155,16 @@ const createWindow = () => {
       .then((data) => {
         if (data.ok) {
           db.run(
-            `INSERT INTO bots (token,user_id,name,username,id) VALUES (?,?,?,?,?)`,
+            `INSERT INTO bots (token,user_id,name,username,id,avatar) VALUES (?,?,?,?,?,?)`,
             [
               token,
               1,
               data.result.first_name,
               data.result.username,
               data.result.id,
+              folder,
             ],
             (err) => {
-              // Должно связываться через WebSockets с ботом и из него отправлять сюда
-              //  все данные бота такие как:
-              // user_id INTEGER,
-              // token TEXT, -- Уже добавляется
-              // name TEXT,
-              // username TEXT,
-              // status TEXT,
-              // avatar TEXT,
-              // socket_id TEXT,
               console.log("!!!FINE!!!");
               if (err) {
                 event.reply("bot-added", { error: err.message });
@@ -185,7 +192,7 @@ const createWindow = () => {
     console.log(data);
     db.run(
       `UPDATE bots SET status = ? WHERE id = ?`,
-      ["active", data],
+      [data.status, data.botId],
       (err) => {
         // console.log("!!!FINE!!!");
         if (err) {
@@ -196,33 +203,51 @@ const createWindow = () => {
       }
     );
   });
+  ipcMain.on("bot-stop-process", (event, data, err) => {
+    db.get("SELECT * FROM bots WHERE username = ?", [data], (err, rows) => {
+      event.reply("bot-stopping-process", rows.id);
+    });
+  });
+  ipcMain.on("get-bot-path", (event, data, err) => {
+    db.get(
+      "SELECT avatar FROM bots WHERE username = ?",
+      [data],
+      (err, rows) => {
+        console.log(rows);
+        event.reply("send-bot-path", rows);
+      }
+    );
+  });
+
   win.webContents.openDevTools();
 };
 app.whenReady().then(() => {
-  socket = ioClient("http://localhost:3000", {
-    reconnection: true,
-    reconnectionDelay: 1000,
-    reconnectionDelayMax: 5000,
+  // socket = ioClient("http://localhost:3000", {
+  //   reconnection: true,
+  //   reconnectionDelay: 1000,
+  //   reconnectionDelayMax: 5000,
+  // });
+  // socket.on("connect", () => {
+  //   console.log("+ Electron connected to sockets");
+  //   socket.emit("register", {
+  //     type: "electron", // ← Тип клиента
+  //     clientId: "electron-app",
+  //     name: "Bot Manager (Electron)",
+  //   });
+  // });
+  // socket.on("telegram-update", (data) => {
+  //   console.log(`Update from bot: ${data.botName}`);
+  //   win.webContents.send("bot-update", data);
+  // });
+  // socket.on("command-executed", (data) => {
+  //   console.log(`Comman executes: ${data.command}`);
+  //   win.webContents.send("command-result", data);
+  // });
+  db.run(`UPDATE bots SET status = ?,socket_id = null`, ["inactive"], (err) => {
+    createWindow();
+    win.loadFile(path.join(__dirname, "index.html"));
   });
-  socket.on("connect", () => {
-    console.log("+ Electron connected to sockets");
 
-    socket.emit("register", {
-      type: "electron", // ← Тип клиента
-      clientId: "electron-app",
-      name: "Bot Manager (Electron)",
-    });
-  });
-  socket.on("telegram-update", (data) => {
-    console.log(`Update from bot: ${data.botName}`);
-    win.webContents.send("bot-update", data);
-  });
-  socket.on("command-executed", (data) => {
-    console.log(`Comman executes: ${data.command}`);
-    win.webContents.send("command-result", data);
-  });
-  createWindow();
-  win.loadFile(path.join(__dirname, "index.html"));
   // app.on("activate", () => {
   //   if (BrowserWindow.getAllWindows().length === 0) {
   //     createWindow();
