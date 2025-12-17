@@ -13,19 +13,15 @@ const socket = io(process.env.SERVER_URL || "http://localhost:3000", {
 });
 
 // ============ TELEGRAF BOT ============
-
 const bot = new Telegraf(
-  process.env.BOT1_TOKEN || "5564104055:AAGFax6uBHyk6eZKD4dUpNlYVnckVZVhZKw"
+  process.env.BOT1_TOKEN || "8347076350:AAH0iteX-L-jgJQzwamK6w8fnweTCjAJteo"
 );
 let BOT_ID;
 const BOT_NAME = process.env.BOT1_NAME || "Bot1";
-
 // ============ SOCKET.IO EVENTS ============
-
 socket.on("connect", () => {
   bot.telegram.getMe().then((me) => {
-    BOT_ID = `bot_${me.id}`; // ← тот же botId всегда!
-
+    BOT_ID = `bot_${me.id}`;
     socket.emit("bot-register", {
       botId: BOT_ID,
       botName: BOT_NAME,
@@ -60,7 +56,6 @@ socket.on("error", (error) => {
 });
 
 // ============ TELEGRAM BOT EVENTS ============
-
 bot.use(async (ctx, next) => {
   const message = ctx.message?.text || `[${ctx.updateType}]`;
   console.log(`[${BOT_NAME}] ${ctx.from.username || ctx.from.id}: ${message}`);
