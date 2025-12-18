@@ -42,7 +42,7 @@ function runRemoteCommand(command, sshConfig) {
 }
 
 async function startBot(botDir, botName, sshConfig) {
-  const START_CMD = `cd ${botDir} && pm2 start bot.js --name ${botName}`;
+  const START_CMD = `cd ${botDir} && pm2 start bot.js --name ${botName} --watch`;
   // const START_CMD = `cd ${botDir} && pm2 start ${botName}.js --name ${botName}`;
   // const START_CMD = `cd ${botDir} && node bot.js`;
   console.log("[SSH] Start command:", START_CMD);

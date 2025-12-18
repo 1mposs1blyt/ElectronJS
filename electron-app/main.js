@@ -145,9 +145,10 @@ const createWindow = () => {
     const bot_ssh_port = data.bot_ssh_port || 22;
     const bot_ssh_username = data.bot_ssh_username;
     const bot_ssh_password = data.bot_ssh_password;
-    const bot_ssh_privateKey = data.bot_ssh_privateKey || "";
+    const bot_ssh_privateKey = data.bot_ssh_privateKey || null;
     const bot_ssh_bot_dir = data.bot_ssh_bot_dir;
     const bot_ssh_bot_name = data.bot_ssh_bot_name || "bot";
+    const bot_ssh_bot_file = data.bot_ssh_bot_file || "bot";
     const apiUrl = `https://api.telegram.org/bot${token}/getMe`;
     let botinfo = [];
     fetch(apiUrl)
@@ -162,8 +163,8 @@ const createWindow = () => {
         if (data.ok) {
           db.run(
             `INSERT INTO bots (token,user_id,name,username,id,
-            ssh_host,ssh_port,ssh_username,ssh_password,ssh_private_key,bot_dir,bot_name
-            ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)`,
+            ssh_host,ssh_port,ssh_username,ssh_password,ssh_private_key,bot_dir,bot_name,bot_file_name
+            ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)`,
             [
               token,
               1,
@@ -177,6 +178,7 @@ const createWindow = () => {
               bot_ssh_privateKey,
               bot_ssh_bot_dir,
               bot_ssh_bot_name,
+              bot_ssh_bot_file,
             ],
             (err) => {
               console.log("!!!FINE!!!");

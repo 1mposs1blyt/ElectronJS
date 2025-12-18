@@ -31,15 +31,13 @@ async function initializeDatabase() {
         username TEXT,
         status TEXT DEFAULT 'inactive',
         avatar TEXT,
-        socket_id TEXT,
-        
         -- SSH данные
         ssh_host TEXT,
         ssh_port INTEGER DEFAULT 22,
         ssh_username TEXT,
         ssh_password TEXT,
         ssh_private_key TEXT,
-        
+        bot_file_name TEXT DEFAULT 'bot.js',
         -- Пути на сервере
         bot_dir TEXT,
         bot_name TEXT,
