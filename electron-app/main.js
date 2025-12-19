@@ -12,21 +12,28 @@ const { io: ioClient } = require("socket.io-client");
 let tray = null;
 let win;
 let socket;
+const os = require("os");
+const os_username = os.userInfo().username;
+const { data } = require("jquery");
 
+// console.log();
 // let db;
 
 const createWindow = () => {
   const primaryDisplay = screen.getPrimaryDisplay();
   const { width: screenWidth, height: screenHeight } =
     primaryDisplay.workAreaSize;
-  const windowWidth = 400; //950;
-  const windowHeight = 600;
+  const windowWidth = 550; // 478; //950;
+  const windowHeight = 650;
   const x_pos = screenWidth - windowWidth;
   const y_pos = screenHeight - windowHeight;
   win = new BrowserWindow({
     frame: 0,
     width: windowWidth,
     height: windowHeight,
+    minWidth: windowWidth,
+    minHeight: windowHeight,
+    resizable: false,
     x: x_pos,
     y: y_pos,
     alwaysOnTop: true,
@@ -72,6 +79,7 @@ const createWindow = () => {
       });
     }
   }
+  // ========================================================= //
   ipcMain.on("close-app", (e) => {
     // win.close(); // Закрыть текущее окно
     if (!app.isQuitting) {
@@ -88,29 +96,30 @@ const createWindow = () => {
   });
   ipcMain.on("maximize-app", () => {
     if (win.isMaximized()) {
+      win.resizable = true;
       win.unmaximize(); // Развернуть из полноэкранного
+      win.resizable = false;
     } else {
       hideTray();
+      win.resizable = true;
       win.maximize(); // Развернуть на весь экран
+      win.resizable = false;
     }
   });
+  // ========================================================= //
+  ipcMain.on("open-home-page", () => {
+    win.loadFile(path.join(__dirname, "/pages/index.html"));
+  });
+  // ========================================================= //
   ipcMain.on("open-settings-window", () => {
-    win.loadFile(path.join(__dirname, "settings.html"));
-    // смена странички
+    win.loadFile(path.join(__dirname, "/pages/settings.html"));
   });
-  ipcMain.on("close-settings-window", () => {
-    win.loadFile(path.join(__dirname, "index.html"));
-    // смена странички
+  // ========================================================= //
+  ipcMain.on("open-profile-window", () => {
+    win.loadFile(path.join(__dirname, "/pages/profile.html"));
   });
+  // ========================================================= //
   ipcMain.on("load-all-bots", (event) => {
-    db.run(`
-      INSERT INTO users (name)
-      SELECT 'alexandr'
-      WHERE NOT EXISTS (
-        SELECT 1 FROM users WHERE name = 'alexandr'
-      );
-      `);
-
     db.all("SELECT * FROM bots", [], (err, rows) => {
       if (err) {
         ``;
@@ -253,6 +262,15 @@ const createWindow = () => {
       event.reply("bot-ssh-config", null);
     }
   });
+  ipcMain.on("update-server-ip", (event, server_ip) => {
+    db.run(`UPDATE users SET server_ip = ?`, [server_ip], (err) => {
+      if (err) {
+        event.reply("update-server-ip-err", err);
+      } else {
+        event.reply("update-server-ip-success");
+      }
+    });
+  });
   ipcMain.on("add-bot-list-with-ssh", (event, data) => {
     console.log("Adding bot with SSH config:", data.bot_name);
 
@@ -273,8 +291,8 @@ const createWindow = () => {
             `INSERT INTO bots (
             token, user_id, name, username, id, avatar,
             ssh_host, ssh_port, ssh_username, ssh_password, ssh_private_key,
-            bot_dir, bot_name
-          ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+            bot_dir, bot_name, bot_file_name
+          ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?)`,
             [
               token,
               1,
@@ -312,10 +330,31 @@ const createWindow = () => {
         event.reply("bot-added", { error: error.message });
       });
   });
+  ipcMain.handle("get-user-data", (event) => {
+    return new Promise((resolve, reject) => {
+      db.get(
+        "SELECT * FROM users WHERE name = ?",
+        [os_username],
+        (err, rows) => {
+          if (err) reject(err);
+          else resolve(rows);
+        }
+      );
+    });
+  });
+  ipcMain.handle("load-all-bots", (event) => {
+    return new Promise((resolve, reject) => {
+      db.all("SELECT * FROM bots", [], (err, rows) => {
+        if (err) reject(err);
+        else resolve(rows);
+      });
+    });
+  });
   win.webContents.openDevTools();
 };
+
 app.whenReady().then(() => {
-  // socket = ioClient("http://localhost:3000", {
+  // socket = ioClient("http://89.251.97.82:31219", {
   //   reconnection: true,
   //   reconnectionDelay: 1000,
   //   reconnectionDelayMax: 5000,
@@ -336,9 +375,10 @@ app.whenReady().then(() => {
   //   console.log(`Comman executes: ${data.command}`);
   //   win.webContents.send("command-result", data);
   // });
+
   db.run(`UPDATE bots SET status = ?,socket_id = null`, ["inactive"], (err) => {
     createWindow();
-    win.loadFile(path.join(__dirname, "index.html"));
+    win.loadFile(path.join(__dirname, "/pages/index.html"));
   });
 });
 

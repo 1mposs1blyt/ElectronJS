@@ -1,10 +1,14 @@
 const sqlite3 = require("sqlite3").verbose();
 const path = require("path");
 const fs = require("fs");
+
 const { app } = require("electron");
 
 const appDataPath = path.join(app.getPath("userData"), "data");
 const dbPath = path.join(appDataPath, "databases.db");
+
+const os = require("os");
+const os_username = os.userInfo().username;
 
 async function initializeDataDirectory() {
   if (!fs.existsSync(appDataPath)) {
@@ -18,7 +22,8 @@ async function initializeDatabase() {
     db.run(`
       CREATE TABLE IF NOT EXISTS users (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        name TEXT NOT NULL
+        name TEXT NOT NULL,
+        server_ip TEXT
       )
     `);
 
@@ -45,14 +50,17 @@ async function initializeDatabase() {
         FOREIGN KEY (user_id) REFERENCES users(id)
       )
     `);
-
+    db.run(
+      `INSERT INTO users (name) SELECT ? WHERE NOT EXISTS (SELECT 1 FROM users WHERE name = ?);`,
+      [os_username, os_username]
+    );
     console.log("Database initialized");
   });
 }
 
 app.on("ready", async () => {
   initializeDataDirectory().then(() => {
-    initializeDatabase();
+    initializeDatabase().then(() => {});
   });
 });
 

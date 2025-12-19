@@ -8,12 +8,15 @@
 @import "../../node_modules/flyonui/variants.css";
 @source "../../node_modules/flyonui/dist/index.js";
 
-.custom-title-bar {
-  /* -webkit-app-region: drag;  */
+/* .custom-title-bar {
+  -webkit-app-region: drag; 
 }
 
 #btn-close,
 #btn-minimize,
 #btn-maximize {
+  -webkit-app-region: no-drag;
+} */
+.opt-btns{
   /* -webkit-app-region: no-drag; */
 }

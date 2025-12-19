@@ -67,7 +67,7 @@ async function startBot(botDir, botName, sshConfig) {
 }
 
 async function stopBot(botDir, botName, sshConfig) {
-  const STOP_CMD = `cd ${botDir} && npx pm2 stop ${botName}`;
+  const STOP_CMD = `cd ${botDir} && npx pm2 stop ${botName} && npx pm2 delete ${botName}`;
   console.log("[SSH] Stop command:", STOP_CMD);
   return await runRemoteCommand(STOP_CMD, sshConfig);
 }

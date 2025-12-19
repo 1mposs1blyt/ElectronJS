@@ -1,0 +1,101 @@
+<!doctype html>
+<html data-theme="vscode">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Bot manager</title>
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="script-src 'self' 'unsafe-inline';"
+    />
+    <link rel="stylesheet" href="./../src/css/output.css" />
+    <script src="./../node_modules/flyonui/flyonui.js"></script>
+    <script src="./../node_modules/socket.io/client-dist/socket.io.js"></script>
+    <script src="./../node_modules/clipboard/dist/clipboard.min.js"></script>
+    <script src="./../src/js/routes.js" defer></script>
+  </head>
+  <body class="overflow-y-hidden select-none">
+    <div
+      id="top-btns"
+      class="custom-title-bar absolute -top-1 left-0 h-10 w-full pr-0 text-white flex flex-row justify-between items-center select-none"
+    >
+      <div class="join opt-btns">
+        <button class="btn btn-soft btn-secondary pt-1" id="home">
+          <span class="icon-[tabler--home] size-5"></span>
+        </button>
+        <button class="btn btn-soft btn-secondary pt-1" id="open-settings">
+          <span class="icon-[tabler--settings] size-5"></span>
+        </button>
+        <button class="btn btn-soft btn-active pt-1" id="open-profile">
+          <span class="icon-[line-md--account] size-5"></span>
+        </button>
+        <button class="btn btn-soft btn-secondary pt-1" id="open-">
+          <span class="icon-[tabler--message] size-5"></span>
+        </button>
+      </div>
+      <div class="join">
+        <input
+          value="—"
+          type="button"
+          id="btn-minimize"
+          class="btn btn-soft btn-success join-item w-14 pt-1 pb-0.5"
+        />
+        <input
+          value="▭"
+          type="button"
+          id="btn-maximize"
+          class="btn btn-soft btn-warning join-item w-14 pt-1 pb-0.5"
+        />
+        <input
+          type="button"
+          id="btn-close"
+          value="✕"
+          class="btn btn-soft btn-error join-item w-14 pt-1 pb-0.5"
+        />
+      </div>
+    </div>
+    <div
+      class="flex items-center flex-col justify-start mt-12 mb-4 h-[92dvh] m-4"
+    >
+      <h1 class="flex mb-2 text-primary text-center self-center text-2xl">
+        Мои настройки:
+      </h1>
+      <div
+        id="profile-list"
+        class="w-fit mr-auto ml-auto flex items-start justify-start flex-col select-none rounded-xl mb-4 h-auto overflow-y-auto"
+      ></div>
+      <h1 class="flex mb-2 text-primary text-center self-center text-2xl">
+        Изменить параметры:
+      </h1>
+      <div
+        id="profile-edit"
+        class="w-fit mr-auto ml-auto flex items-start justify-ce flex-col select-none rounded-xl mb-4 h-auto overflow-y-auto"
+      >
+        <div
+          class="skeleton-striped w-full min-w-110 min-h-32 h-fit flex items-center flex-row select-none rounded-xl mb-3 pt-2 pb-2"
+        >
+          <div class="flex flex-col ml-7.5 mr-auto">
+            <div class="justify-center mb-4" id="bot-name">
+              <span class="text-primary">Адрес удаленного сервера:</span>
+              <input
+                type="text"
+                placeholder="Адрес сервера"
+                class="input max-w-sm"
+                id="server_address"
+              />
+            </div>
+
+            <div class="text-secondary mb-4">
+              <button
+                id="save_server_address"
+                class="btn btn-primary w-full max-w-sm"
+              >
+                Сохранить
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+  <script src="./../src/js/renderer3.js"></script>
+</html>

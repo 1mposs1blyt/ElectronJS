@@ -1,0 +1,76 @@
+<!doctype html>
+<html data-theme="vscode">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Bot manager</title>
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="script-src 'self' 'unsafe-inline';"
+    />
+    <script src="./../node_modules/flyonui/flyonui.js"></script>
+    <link rel="stylesheet" href="./../src/css/output.css" />
+    <script src="./../node_modules/socket.io/client-dist/socket.io.js"></script>
+    <script src="./../node_modules/clipboard/dist/clipboard.min.js"></script>
+    <script src="./../src/js/routes.js" defer></script>
+    <script src="./../src/js/renderer.js" defer></script>
+  </head>
+  <body class="overflow-y-hidden select-none">
+    <div
+      id="top-btns"
+      class="custom-title-bar absolute -top-1 left-0 h-10 w-full pr-0 text-white flex flex-row justify-between items-center select-none"
+    >
+      <div class="join opt-btns">
+        <button class="btn btn-soft btn-active pt-1" id="home">
+          <span class="icon-[tabler--home] size-5"></span>
+        </button>
+        <button class="btn btn-soft btn-secondary pt-1" id="open-settings">
+          <span class="icon-[tabler--settings] size-5"></span>
+        </button>
+        <button class="btn btn-soft btn-secondary pt-1" id="open-profile">
+          <span class="icon-[line-md--account] size-5"></span>
+        </button>
+        <button class="btn btn-soft btn-secondary pt-1" id="open-">
+          <span class="icon-[tabler--message] size-5"></span>
+        </button>
+      </div>
+      <div class="join">
+        <input
+          value="—"
+          type="button"
+          id="btn-minimize"
+          class="btn btn-soft btn-success join-item w-14 pt-1 pb-0.5"
+        />
+        <input
+          value="▭"
+          type="button"
+          id="btn-maximize"
+          class="btn btn-soft btn-warning join-item w-14 pt-1 pb-0.5"
+        />
+        <input
+          type="button"
+          id="btn-close"
+          value="✕"
+          class="btn btn-soft btn-error join-item w-14 pt-1 pb-0.5"
+        />
+      </div>
+    </div>
+    <div
+      class="flex items-center flex-col justify-start mt-12 mb-4 h-[92dvh] m-4"
+    >
+      <div
+        class="items-center text-center justify-center flex flex-col align-center mb-4"
+      >
+        <h1 class="text-primary text-center self-center text-2xl">
+          Ваши боты:
+        </h1>
+        <p class="text-secondary text-xl">
+          Используй кнопку настроек для добавления
+        </p>
+      </div>
+      <div
+        id="bot-list"
+        class="w-fit flex items-start justify-start flex-col select-none rounded-xl mb-4 h-auto overflow-y-auto ml-auto mr-auto"
+      ></div>
+    </div>
+  </body>
+</html>
