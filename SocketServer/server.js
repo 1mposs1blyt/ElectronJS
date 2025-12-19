@@ -4,7 +4,7 @@ const http = require("http");
 const socketIo = require("socket.io");
 const cors = require("cors");
 const { startBot, stopBot } = require("./ssh-bot-control");
-
+require("dotenv").config({ path: "./.env" });
 const app = express();
 const server = http.createServer(app);
 const io = socketIo(server, {
@@ -42,7 +42,8 @@ io.on("connection", (socket) => {
       !data.botName ||
       !data.sshConfig ||
       !data.sshConfig.host ||
-      !data.sshConfig.username
+      !data.sshConfig.username ||
+      !data.sshConfig.bot_file_name
     ) {
       callback({
         success: false,
@@ -374,7 +375,7 @@ app.get("/api/remote-bot/status", (req, res) => {
 
 // ============ ЗАПУСК ============
 
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 2999;
 
 server.listen(PORT, () => {
   console.log(`✓ Сервер запущен на http://localhost:${PORT}`);

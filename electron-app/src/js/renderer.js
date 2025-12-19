@@ -3,7 +3,7 @@ const $ = require("jquery");
 const path = require("node:path");
 const fs = require("fs");
 const { io } = require("socket.io-client");
-const socket = io("http://localhost:3000");
+const socket = io("http://89.251.97.82:31219");
 
 document.getElementById("btn-close").addEventListener("click", () => {
   ipcRenderer.send("close-app");

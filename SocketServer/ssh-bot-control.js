@@ -1,14 +1,31 @@
 // ssh-bot-control.js
 const { Client } = require("ssh2");
 
-function runRemoteCommand(command, sshConfig) {
+function runRemoteCommand(command, sshConfig, botDir) {
   return new Promise((resolve, reject) => {
     const conn = new Client();
-
     conn
       .on("ready", () => {
         console.log("[SSH] Connected to", sshConfig.host);
+        // conn.sftp((err, sftp) => {
+        //   if (err) throw err;
 
+        //   const remoteFilePath = `${botDir}\\${sshConfig.bot_file_name}`;
+        //   sftp.stat(remoteFilePath, (err, stats) => {
+        //     if (err) {
+        //       // Handle the error, most likely 'ENOENT' for "No such file or directory"
+        //       console.log(
+        //         `[SSH] File ${remoteFilePath} does not exist or an error occurred:`,
+        //         err.message
+        //       );
+        //       conn.end();
+        //     } else {
+        //       console.log(
+        //         `[SSH] File ${remoteFilePath} exists. Size: ${stats.size} bytes.`
+        //       );
+        //     }
+        //   });
+        // });
         conn.exec(command, (err, stream) => {
           if (err) {
             conn.end();
@@ -42,15 +59,15 @@ function runRemoteCommand(command, sshConfig) {
 }
 
 async function startBot(botDir, botName, sshConfig) {
-  const START_CMD = `cd ${botDir} && pm2 start bot.js --name ${botName} --watch`;
-  // const START_CMD = `cd ${botDir} && pm2 start ${botName}.js --name ${botName}`;
-  // const START_CMD = `cd ${botDir} && node bot.js`;
+  // console.log(``);
+  // const START_CMD = `cd ${botDir} && node bot.js `;
+  const START_CMD = `cd ${botDir} && npx pm2 start ${sshConfig.bot_file_name} --name ${botName} --watch`;
   console.log("[SSH] Start command:", START_CMD);
-  return await runRemoteCommand(START_CMD, sshConfig);
+  return await runRemoteCommand(START_CMD, sshConfig, botDir);
 }
 
 async function stopBot(botDir, botName, sshConfig) {
-  const STOP_CMD = `cd ${botDir} && pm2 stop ${botName}`;
+  const STOP_CMD = `cd ${botDir} && npx pm2 stop ${botName}`;
   console.log("[SSH] Stop command:", STOP_CMD);
   return await runRemoteCommand(STOP_CMD, sshConfig);
 }

@@ -9,19 +9,6 @@ const {
 const path = require("node:path");
 const { db, dbPath } = require("./src/js/databases");
 const { io: ioClient } = require("socket.io-client");
-const { event } = require("jquery");
-
-// ======================== Запуск socket.io сервера ======================== //
-// const { spawn } = require("child_process");
-// const scriptPath = path.join(__dirname, "/SocketServer/server.js");
-// const child = spawn(process.execPath, [scriptPath], {
-//   detached: true, // Allows the child to run independently of the parent
-//   stdio: "ignore", // Detaches stdio streams
-// });
-// child.unref();
-// Для запуска бота из приложения можно сделать дополнительное поле в котором будет содержаться путь к боту
-// и по аналогии с кодом выше будет запускаться бот
-// ======================== Запуск socket.io сервера ======================== //
 let tray = null;
 let win;
 let socket;
@@ -232,10 +219,6 @@ const createWindow = () => {
   });
   ipcMain.on("get-bot-ssh-config", (event, botId) => {
     try {
-      // НЕПРАВИЛЬНО (synchronous):
-      // const bot = db.prepare("SELECT * FROM bots WHERE id = ?").get(botId);
-
-      // ПРАВИЛЬНО (асинхронный callback):
       db.get("SELECT * FROM bots WHERE id = ?", [botId], (err, bot) => {
         if (err) {
           console.error("Database error:", err);
@@ -257,6 +240,7 @@ const createWindow = () => {
             username: bot.ssh_username,
             password: bot.ssh_password,
             privateKey: bot.ssh_private_key,
+            bot_file_name: bot.bot_file_name,
           },
           botDir: bot.bot_dir,
           botName: bot.bot_name,
