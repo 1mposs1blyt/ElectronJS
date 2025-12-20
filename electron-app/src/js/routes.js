@@ -4,6 +4,8 @@
 // const fs = require("fs");
 // const { io } = require("socket.io-client");
 
+// const { ipcRenderer } = require("electron");
+
 // =================================================================== //
 document.getElementById("btn-close").addEventListener("click", () => {
   ipcRenderer.send("close-app");
@@ -25,5 +27,8 @@ document.getElementById("open-settings").addEventListener("click", () => {
 });
 document.getElementById("open-profile").addEventListener("click", () => {
   ipcRenderer.send("open-profile-window");
+});
+document.getElementById("open-bot-settings").addEventListener("click",()=>{
+  ipcRenderer.send("open-bot-settings-window");
 });
 // =================================================================== //

@@ -14,7 +14,7 @@ let win;
 let socket;
 const os = require("os");
 const os_username = os.userInfo().username;
-const { data } = require("jquery");
+const { data, event } = require("jquery");
 
 // console.log();
 // let db;
@@ -33,7 +33,7 @@ const createWindow = () => {
     height: windowHeight,
     minWidth: windowWidth,
     minHeight: windowHeight,
-    resizable: false,
+    // resizable: false,
     x: x_pos,
     y: y_pos,
     alwaysOnTop: true,
@@ -118,6 +118,9 @@ const createWindow = () => {
   ipcMain.on("open-profile-window", () => {
     win.loadFile(path.join(__dirname, "/pages/profile.html"));
   });
+  ipcMain.on("open-bot-settings-window", (event, data) => {
+    win.loadFile(path.join(__dirname, "/pages/bot-settings.html"));
+  });
   // ========================================================= //
   ipcMain.on("load-all-bots", (event) => {
     db.all("SELECT * FROM bots", [], (err, rows) => {
@@ -136,7 +139,6 @@ const createWindow = () => {
   ipcMain.on("add-bot-list", (event, data, err) => {
     console.log(data.bot_token + "\n" + data.bot_folder);
     const token = data.bot_token;
-    const folder = data.bot_folder;
     const bot_ssh_host = data.bot_ssh_host;
     const bot_ssh_port = data.bot_ssh_port || 22;
     const bot_ssh_username = data.bot_ssh_username;
@@ -150,7 +152,9 @@ const createWindow = () => {
     fetch(apiUrl)
       .then((response) => {
         if (!response.ok) {
-          // A non-ok response status (e.g., 401 Unauthorized for invalid token)
+          event.reply("bot-added", {
+            result: `Ошибка добавления: ${response.status}, перепроверьте токен!`,
+          });
           throw new Error(`HTTP error! status: ${response.status}`);
         }
         return response.json();
@@ -179,20 +183,69 @@ const createWindow = () => {
             (err) => {
               console.log("!!!FINE!!!");
               if (err) {
-                event.reply("bot-added", { error: err.message });
+                event.reply("bot-added", {
+                  result: "Ошибка добавлния бота в базу данных",
+                });
               } else {
-                event.reply("bot-added", token);
+                event.reply("bot-added", { result: "Бот добавлен успешно!" });
               }
             }
           );
           console.log("Bot Information:", data.result);
         } else {
+          event.reply("bot-added", {
+            result: "Ошибка Telegram API",
+          });
           console.error("Telegram API Error:", data.description);
         }
       })
       .catch((error) => {
         console.error("Error fetching bot information:", error.message);
       });
+  });
+  ipcMain.on("update-bot", (event, data) => {
+    const bot_username = data.bot_username;
+    let new_ssh_host, new_ssh_port, new_ssh_username, new_ssh_password,new_ssh_private_key,new_ssh_bot_dir,new_ssh_bot_name,new_ssh_bot_file_name; // prettier-ignore
+    db.get(
+      "SELECT * FROM bots WHERE username = ?",
+      [bot_username],
+      (err, rows) => {
+        if (err) {
+          console.log(err);
+          event.reply("bots-loaded", { error: err.message });
+          return;
+        }
+        {!data.new_ssh_host.length == 0 || !data.new_ssh_host == undefined ? new_ssh_host = data.new_ssh_host : new_ssh_host=rows.ssh_host} // prettier-ignore
+        {!data.new_ssh_port.length == 0 || !data.new_ssh_port == undefined ? new_ssh_port = data.new_ssh_port : new_ssh_port=rows.ssh_port} // prettier-ignore
+        {!data.new_ssh_username.length == 0 || !data.new_ssh_username == undefined ? new_ssh_username = data.new_ssh_username : new_ssh_username=rows.ssh_username} // prettier-ignore
+        {!data.new_ssh_password.length == 0 || !data.new_ssh_password == undefined ? new_ssh_password = data.new_ssh_password : new_ssh_password=rows.ssh_password} // prettier-ignore
+        {!data.new_ssh_private_key.length == 0 || !data.new_ssh_private_key == undefined ? new_ssh_private_key = data.new_ssh_private_key : new_ssh_private_key=rows.ssh_private_key} // prettier-ignore
+        {!data.new_ssh_bot_dir.length == 0 || !data.new_ssh_bot_dir == undefined ? new_ssh_bot_dir = data.new_ssh_bot_dir : new_ssh_bot_dir=rows.bot_dir} // prettier-ignore
+        {!data.new_ssh_bot_name.length == 0 || !data.new_ssh_bot_name == undefined ? new_ssh_bot_name = data.new_ssh_bot_name : new_ssh_bot_name=rows.bot_name} // prettier-ignore
+        {!data.new_ssh_bot_file_name.length == 0 || !data.new_ssh_bot_file_name == undefined ? new_ssh_bot_file_name = data.new_ssh_bot_file_name : new_ssh_bot_file_name=rows.bot_file_name} // prettier-ignore
+        const new_data = { new_ssh_host, new_ssh_port, new_ssh_username, new_ssh_password, new_ssh_private_key, new_ssh_bot_dir, new_ssh_bot_name, new_ssh_bot_file_name}; // prettier-ignore
+        console.log(new_data)
+        db.run(
+          `UPDATE bots SET ssh_host = ?, ssh_port = ?, ssh_username = ?, ssh_password = ?, ssh_private_key = ?, bot_dir = ?, bot_name = ?, bot_file_name = ? WHERE username = ?`, // prettier-ignore
+          [new_ssh_host, new_ssh_port, new_ssh_username, new_ssh_password,new_ssh_private_key,new_ssh_bot_dir,new_ssh_bot_name,new_ssh_bot_file_name,bot_username], // prettier-ignore
+          (err) => {
+            if (err) {
+              console.log(err);
+              event.reply("bot-updated", {
+                result: "Ошибка обновления!",
+              });
+            } else {
+              event.reply("bot-updated", {
+                result: "Бот обновлен успешно!",
+              });
+            }
+          }
+        );
+
+        // console.log("Data from table bots&rendere4.js:");
+        // console.log(new_data);
+      }
+    );
   });
   ipcMain.handle("get-server-status", async () => {
     return new Promise((resolve) => {
@@ -218,12 +271,6 @@ const createWindow = () => {
   ipcMain.on("bot-stop-process", (event, data, err) => {
     db.get("SELECT * FROM bots WHERE username = ?", [data], (err, rows) => {
       event.reply("bot-stopping-process", rows.id);
-    });
-  });
-  ipcMain.on("get-bot-path", (event, data, err) => {
-    db.get("SELECT avatar FROM bots WHERE id = ?", [data], (err, rows) => {
-      console.log(rows);
-      event.reply("send-bot-path", rows);
     });
   });
   ipcMain.on("get-bot-ssh-config", (event, botId) => {
@@ -271,65 +318,6 @@ const createWindow = () => {
       }
     });
   });
-  ipcMain.on("add-bot-list-with-ssh", (event, data) => {
-    console.log("Adding bot with SSH config:", data.bot_name);
-
-    const token = data.bot_token;
-    const folder = data.bot_folder;
-    const apiUrl = `https://api.telegram.org/bot${token}/getMe`;
-
-    fetch(apiUrl)
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        return response.json();
-      })
-      .then((botData) => {
-        if (botData.ok) {
-          db.run(
-            `INSERT INTO bots (
-            token, user_id, name, username, id, avatar,
-            ssh_host, ssh_port, ssh_username, ssh_password, ssh_private_key,
-            bot_dir, bot_name, bot_file_name
-          ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?)`,
-            [
-              token,
-              1,
-              botData.result.first_name,
-              botData.result.username,
-              botData.result.id,
-              folder,
-              // SSH данные
-              data.ssh_host || "",
-              data.ssh_port || 22,
-              data.ssh_username || "",
-              data.ssh_password || "",
-              data.ssh_private_key || "",
-              // Пути
-              data.bot_dir || "",
-              data.bot_name || botData.result.username,
-            ],
-            (err) => {
-              if (err) {
-                console.error("Insert error:", err);
-                event.reply("bot-added", { error: err.message });
-              } else {
-                console.log("✓ Bot added successfully with SSH config");
-                event.reply("bot-added", { success: true, token });
-              }
-            }
-          );
-        } else {
-          console.error("Telegram API Error:", botData.description);
-          event.reply("bot-added", { error: botData.description });
-        }
-      })
-      .catch((error) => {
-        console.error("Error fetching bot info:", error);
-        event.reply("bot-added", { error: error.message });
-      });
-  });
   ipcMain.handle("get-user-data", (event) => {
     return new Promise((resolve, reject) => {
       db.get(
@@ -375,7 +363,6 @@ app.whenReady().then(() => {
   //   console.log(`Comman executes: ${data.command}`);
   //   win.webContents.send("command-result", data);
   // });
-
   db.run(`UPDATE bots SET status = ?,socket_id = null`, ["inactive"], (err) => {
     createWindow();
     win.loadFile(path.join(__dirname, "/pages/index.html"));

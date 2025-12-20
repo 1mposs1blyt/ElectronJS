@@ -19,10 +19,24 @@ async function getDataFromDB(user_param) {
 async function setNewServerIP(server_ip) {
   ipcRenderer.send("update-server-ip", server_ip);
   ipcRenderer.once("update-server-ip-err", (err) => {
-    alert(err);
+    const toast = document.getElementById("toast-notification");
+    toast.textContent = `Ошибка: ${err}`;
+    toast.classList.remove("hidden");
+
+    setTimeout(() => {
+      toast.classList.add("hidden");
+    }, 2000);
+    // alert(err);
   });
   ipcRenderer.once("update-server-ip-success", () => {
-    alert("Успешно!");
+    // alert("Успешно!");
+    const toast = document.getElementById("toast-notification");
+    toast.textContent = `Успешно!`;
+    toast.classList.remove("hidden");
+
+    setTimeout(() => {
+      toast.classList.add("hidden");
+    }, 2000);
     renderProfile();
   });
 }
@@ -52,7 +66,7 @@ async function renderProfile() {
   }
 }
 document.addEventListener("DOMContentLoaded", async () => {
-  renderProfile();
+  await renderProfile();
 });
 document
   .getElementById("save_server_address")

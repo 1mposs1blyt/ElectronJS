@@ -11,6 +11,7 @@
     <script src="./../node_modules/flyonui/flyonui.js"></script>
     <script src="./../node_modules/socket.io/client-dist/socket.io.js"></script>
     <script src="./../node_modules/clipboard/dist/clipboard.min.js"></script>
+    <script src="./../src/js/renderer4.js" defer></script>
     <script src="./../src/js/routes.js" defer></script>
   </head>
   <body class="overflow-y-hidden select-none">
@@ -25,10 +26,10 @@
         <button class="btn btn-soft btn-secondary pt-1" id="open-settings">
           <span class="icon-[tabler--settings] size-5"></span>
         </button>
-        <button class="btn btn-soft btn-active pt-1" id="open-profile">
+        <button class="btn btn-soft btn-secondary pt-1" id="open-profile">
           <span class="icon-[line-md--account] size-5"></span>
         </button>
-        <button class="btn btn-soft btn-secondary pt-1" id="open-bot-settings">
+        <button class="btn btn-soft btn-active pt-1" id="open-bot-settings">
           <span class="icon-[tabler--message] size-5"></span>
         </button>
       </div>
@@ -54,42 +55,50 @@
       </div>
     </div>
     <div
+      id="bot-settings"
       class="flex items-center flex-col justify-start mt-12 mb-4 h-[92dvh] m-4"
     >
       <h1 class="flex mb-2 text-primary text-center self-center text-2xl">
-        Мои настройки:
+        Настройки ботов:
       </h1>
       <div
-        id="profile-list"
-        class="w-fit mr-auto ml-auto flex items-start justify-start flex-col select-none rounded-xl mb-4 h-auto overflow-y-auto"
+        hidden
+        id="bot-name-list"
+        class="skeleton-striped w-fit flex items-start justify-start flex-col select-none rounded-xl mb-2 h-86 overflow-y-auto pl-6 pr-6 pt-2 pb-2"
       ></div>
       <h1 class="flex mb-2 text-primary text-center self-center text-2xl">
-        Изменить параметры:
+        Бот для редактирования:
       </h1>
       <div
-        id="profile-edit"
-        class="w-fit mr-auto ml-auto flex items-start justify-ce flex-col select-none rounded-xl mb-4 h-auto overflow-y-auto"
+        hidden
+        id="bot-current-edit"
+        class="skeleton-striped w-110 h-auto flex items-start flex-row select-none rounded-xl mb-3 pt-2 pb-2 overflow-y-auto"
+      ></div>
+      <div
+        id="bot-settings-edit"
+        class="w-fit mr-auto ml-auto flex items-start justify-center flex-col select-none rounded-xl mb-4 h-auto pt-3 pb-3"
       >
         <div
-          class="skeleton-striped w-full min-w-110 min-h-32 h-fit flex items-center flex-row select-none rounded-xl mb-3 pt-2 pb-2"
+          class="skeleton-striped min-w-110 min-h-32 h-fit flex items-center flex-row select-none rounded-xl mb-3"
         >
-          <div class="flex flex-col ml-7.5 mr-auto">
-            <div class="justify-center mb-4" id="bot-name">
-              <span class="text-primary">Адрес удаленного сервера:</span>
+          <div class="flex flex-col w-full items-center">
+            <div class="justify-center mb-4 min-w-96" id="bot-name">
+              <span class="text-primary">Имя бота:</span>
               <input
                 type="text"
-                placeholder="Новый адрес сервера"
+                placeholder="username бота для редактирования"
                 class="input max-w-sm"
-                id="server_address"
+                id="bot-edit-username"
+                autocomplete="off"
               />
             </div>
-
-            <div class="text-secondary mb-4">
+            <div class="justify-center mb-4 min-w-96">
               <button
-                id="save_server_address"
+                type="button"
+                id="bot-edit-username-send"
                 class="btn btn-primary w-full max-w-sm"
               >
-                Сохранить
+                Изменить
               </button>
             </div>
           </div>
@@ -99,8 +108,6 @@
     <div
       id="toast-notification"
       class="hidden fixed top-4 right-4 bg-info text-info-content px-4 py-2 rounded"
-    >
-    </div>
+    ></div>
   </body>
-  <script src="./../src/js/renderer3.js"></script>
 </html>

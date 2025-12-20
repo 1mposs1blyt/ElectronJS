@@ -35,7 +35,6 @@ async function initializeDatabase() {
         name TEXT,
         username TEXT,
         status TEXT DEFAULT 'inactive',
-        avatar TEXT,
         -- SSH данные
         ssh_host TEXT,
         ssh_port INTEGER DEFAULT 22,

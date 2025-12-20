@@ -26,7 +26,8 @@ document.getElementById("add_bot").addEventListener("click", () => {
     bot_ssh_bot_name: bot_ssh_bot_name.val(),
     bot_ssh_bot_file: bot_ssh_bot_file.val(),
   });
-  ipcRenderer.on("bot-added", (event, data, err) => {
+  ipcRenderer.once("bot-added", (event, data, err) => {
+    console.log({ data, err });
     bot_token.val("");
     bot_folder.val("");
     bot_ssh_host.val("");
@@ -37,5 +38,13 @@ document.getElementById("add_bot").addEventListener("click", () => {
     bot_ssh_bot_dir.val("");
     bot_ssh_bot_name.val("");
     bot_ssh_bot_file.val("");
+
+    const toast = document.getElementById("toast-notification");
+    toast.textContent = data.result;
+    toast.classList.remove("hidden");
+
+    setTimeout(() => {
+      toast.classList.add("hidden");
+    }, 2000);
   });
 });
