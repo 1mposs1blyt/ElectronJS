@@ -1,12 +1,12 @@
-const { ipcRenderer } = require("electron");
-const $ = require("jquery");
-const path = require("node:path");
-const fs = require("fs");
-const { io } = require("socket.io-client");
+// const { ipcRenderer } = require("electron");
+// const $ = require("jquery");
+// const path = require("node:path");
+// const fs = require("fs");
+// const { io } = require("socket.io-client");
 
 // ====== DB helpers ======
 async function getDataFromDB(user_param) {
-  const data = await ipcRenderer.invoke("get-user-data");
+  const data = await window.ipc.invoke("get-user-data");
   return data[user_param];
 }
 async function getServerIP() {
@@ -17,7 +17,7 @@ let socket = null;
 // ====== Рендер ботов через invoke (без send/once) ======
 async function renderBots() {
   try {
-    const data = await ipcRenderer.invoke("load-all-bots"); // ЖДЁМ данные
+    const data = await window.ipc.invoke("load-all-bots"); // ЖДЁМ данные
 
     $("#bot-list").empty();
 
@@ -137,9 +137,9 @@ function remote_bot_start(el) {
   el.disabled = true;
   el.textContent = "Запуск...";
 
-  ipcRenderer.send("get-bot-ssh-config", botId);
+  window.ipc.send("get-bot-ssh-config", botId);
 
-  ipcRenderer.once("bot-ssh-config", (event, botData) => {
+  window.ipc.once("bot-ssh-config", (event, botData) => {
     if (!botData || !botData.ssh || !botData.botDir || !botData.botName) {
       const toast = document.getElementById("toast-notification");
       toast.textContent = `✗ Ошибка: SSH данные не настроены для этого бота`;
@@ -175,11 +175,11 @@ function remote_bot_start(el) {
             toast.classList.add("hidden");
           }, 2000);
           // alert("✓ Удалённый бот запущен");
-          ipcRenderer.send("update-bot-status", {
+          window.ipc.send("update-bot-status", {
             botId: botId,
             status: "active",
           });
-          ipcRenderer.once("bot-status-updated", () => {});
+          window.ipc.once("bot-status-updated", () => {});
           renderBots();
         } else {
           console.error("✗ Ошибка запуска:", response.error);
@@ -202,9 +202,9 @@ function remote_bot_stop(el) {
   el.disabled = true;
   el.textContent = "Стоп...";
 
-  ipcRenderer.send("get-bot-ssh-config", botId);
+  window.ipc.send("get-bot-ssh-config", botId);
 
-  ipcRenderer.once("bot-ssh-config", (event, botData) => {
+  window.ipc.once("bot-ssh-config", (event, botData) => {
     if (!botData || !botData.ssh || !botData.botDir || !botData.botName) {
       // alert("✗ Ошибка: SSH данные не настроены для этого бота");
       const toast = document.getElementById("toast-notification");
@@ -242,11 +242,11 @@ function remote_bot_stop(el) {
             toast.classList.add("hidden");
           }, 2000);
 
-          ipcRenderer.send("update-bot-status", {
+          window.ipc.send("update-bot-status", {
             botId: botId,
             status: "inactive",
           });
-          ipcRenderer.once("bot-status-updated", () => {});
+          window.ipc.once("bot-status-updated", () => {});
           renderBots();
         } else {
           console.error("✗ Ошибка остановки:", response.error);
@@ -272,35 +272,35 @@ function remote_bot_stop(el) {
 
   socket.on("bot-register", (data) => {
     console.log("[RENDERER] bot-register", data);
-    ipcRenderer.send("update-bot-status", {
+    window.ipc.send("update-bot-status", {
       botId: data.botId,
       status: "active",
       process: data.process,
     });
-    ipcRenderer.once("bot-status-updated", () => {});
+    window.ipc.once("bot-status-updated", () => {});
     renderBots();
   });
 
   socket.on("bot-disconnected", (data) => {
     console.log("[RENDERER] bot-disconnected", data);
     const botId = data.botId.split("bot_")[1];
-    ipcRenderer.send("update-bot-status", {
+    window.ipc.send("update-bot-status", {
       botId: botId,
       status: "inactive",
       process: data.process,
     });
-    ipcRenderer.once("bot-status-updated", () => {});
+    window.ipc.once("bot-status-updated", () => {});
     renderBots();
   });
 
   socket.on("bot-timer-update", (data) => {
     console.log("[RENDERER] bot-timer-update", data);
-    ipcRenderer.send("update-bot-status", {
+    window.ipc.send("update-bot-status", {
       botId: data.botId,
       status: "active",
       process: data.process,
     });
-    ipcRenderer.once("bot-status-updated", () => {});
+    window.ipc.once("bot-status-updated", () => {});
     renderBots();
   });
 })();

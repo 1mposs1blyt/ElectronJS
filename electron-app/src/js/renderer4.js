@@ -1,8 +1,8 @@
-const $ = require("jquery");
-const { ipcRenderer } = require("electron");
-const path = require("node:path");
-const fs = require("fs");
-const { io } = require("socket.io-client");
+// const $ = require("jquery");
+// const { ipcRenderer } = require("electron");
+// const path = require("node:path");
+// const fs = require("fs");
+// const { io } = require("socket.io-client");
 
 function BotEditSave() {
   const bot_username = $("#current-bot-edit");
@@ -34,8 +34,8 @@ function BotEditSave() {
   new_ssh_bot_name.val("");
   new_ssh_bot_file_name.val("");
   console.log(data);
-  ipcRenderer.send("update-bot", data);
-  ipcRenderer.once("bot-updated", (event, data) => {
+  window.ipc.send("update-bot", data);
+  window.ipc.once("bot-updated", (event, data) => {
     const toast = document.getElementById("toast-notification");
     toast.textContent = `${data.result}`;
     toast.classList.remove("hidden");
@@ -48,7 +48,7 @@ function BotEditSave() {
 
 async function renderBotEditingList(botname) {
   try {
-    const data = await ipcRenderer.invoke("load-all-bots"); // ЖДЁМ данные
+    const data = await window.ipc.invoke("load-all-bots"); // ЖДЁМ данные
     if (!data || data.error || data.length === 0) {
       const toast = document.getElementById("toast-notification");
       toast.textContent = `✗ Ошибка: Кажется такого бота нет`;
@@ -206,7 +206,7 @@ async function renderBotNames() {
   $("#bot-settings-edit").removeAttr("hidden");
   $("#bot-name-list").empty();
   try {
-    const data = await ipcRenderer.invoke("load-all-bots"); // ЖДЁМ данные
+    const data = await window.ipc.invoke("load-all-bots"); // ЖДЁМ данные
 
     if (!data || data.error || data.length === 0) {
       $("#bot-name-list").append(`
@@ -251,8 +251,8 @@ async function deleteBotByUsername(username) {
   const data = {
     bot_username: username,
   };
-  ipcRenderer.send("delete-bot", data);
-  ipcRenderer.once("bot-deleted", (event, data) => {
+  window.ipc.send("delete-bot", data);
+  window.ipc.once("bot-deleted", (event, data) => {
     const toast = document.getElementById("toast-notification");
     toast.textContent = `${data.result}`;
     toast.classList.remove("hidden");

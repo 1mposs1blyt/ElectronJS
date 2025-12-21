@@ -1,10 +1,10 @@
-window.addEventListener("DOMContentLoaded", () => {
-  const replaceText = (selector, text) => {
-    const element = document.getElementById(selector);
-    if (element) element.innerText = text;
-  };
+const { contextBridge, ipcRenderer } = require("electron");
 
-  for (const type of ["chrome", "node", "electron"]) {
-    replaceText(`${type}-version`, process.versions[type]);
-  }
+contextBridge.exposeInMainWorld("ipc", {
+  send: (channel, data) => ipcRenderer.send(channel, data),
+  invoke: (channel, data) => ipcRenderer.invoke(channel, data),
+  once: (channel, callback) => ipcRenderer.once(channel, callback),
+  on: (channel, callback) => ipcRenderer.on(channel, callback),
+  removeListener: (channel, callback) =>
+    window.ipc.removeListener(channel, callback),
 });

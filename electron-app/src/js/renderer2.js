@@ -1,7 +1,7 @@
-const { ipcRenderer } = require("electron");
-const $ = require("jquery");
-const path = require("node:path");
-const fs = require("fs");
+// const { ipcRenderer } = require("electron");
+// const $ = require("jquery");
+// const path = require("node:path");
+// const fs = require("fs");
 
 document.getElementById("add_bot").addEventListener("click", () => {
   const bot_token = $("#bot_token");
@@ -14,7 +14,7 @@ document.getElementById("add_bot").addEventListener("click", () => {
   const bot_ssh_bot_dir = $("#bot_ssh_bot_dir");
   const bot_ssh_bot_name = $("#bot_ssh_bot_name");
   const bot_ssh_bot_file = $("#bot_ssh_bot_file");
-  ipcRenderer.send("add-bot-list", {
+  window.ipc.send("add-bot-list", {
     bot_token: bot_token.val(),
     bot_folder: bot_folder.val(),
     bot_ssh_host: bot_ssh_host.val(),
@@ -26,7 +26,7 @@ document.getElementById("add_bot").addEventListener("click", () => {
     bot_ssh_bot_name: bot_ssh_bot_name.val(),
     bot_ssh_bot_file: bot_ssh_bot_file.val(),
   });
-  ipcRenderer.once("bot-added", (event, data, err) => {
+  window.ipc.once("bot-added", (event, data, err) => {
     console.log({ data, err });
     bot_token.val("");
     bot_folder.val("");

@@ -3,32 +3,31 @@
 // const path = require("node:path");
 // const fs = require("fs");
 // const { io } = require("socket.io-client");
-
 // const { ipcRenderer } = require("electron");
 
 // =================================================================== //
 document.getElementById("btn-close").addEventListener("click", () => {
-  ipcRenderer.send("close-app");
+  window.ipc.send("close-app");
 });
 document.getElementById("btn-minimize").addEventListener("click", () => {
-  ipcRenderer.send("minimize-app");
+  window.ipc.send("minimize-app");
 });
 document.getElementById("btn-maximize").addEventListener("click", () => {
-  ipcRenderer.send("maximize-app");
+  window.ipc.send("maximize-app");
 });
 // =================================================================== //
 //
 // =================================================================== //
 document.getElementById("home").addEventListener("click", () => {
-  ipcRenderer.send("open-home-page");
+  window.ipc.send("open-home-page");
 });
 document.getElementById("open-settings").addEventListener("click", () => {
-  ipcRenderer.send("open-settings-window");
+  window.ipc.send("open-settings-window");
 });
 document.getElementById("open-profile").addEventListener("click", () => {
-  ipcRenderer.send("open-profile-window");
+  window.ipc.send("open-profile-window");
 });
 document.getElementById("open-bot-settings").addEventListener("click",()=>{
-  ipcRenderer.send("open-bot-settings-window");
+  window.ipc.send("open-bot-settings-window");
 });
 // =================================================================== //

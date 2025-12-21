@@ -1,11 +1,11 @@
-const { ipcRenderer } = require("electron");
-const $ = require("jquery");
-const path = require("node:path");
-const fs = require("fs");
-const { io } = require("socket.io-client");
+// const { ipcRenderer } = require("electron");
+// const $ = require("jquery");
+// const path = require("node:path");
+// const fs = require("fs");
+// const { io } = require("socket.io-client");
 
 async function getDataFromDB(user_param) {
-  const data = await ipcRenderer.invoke("get-user-data");
+  const data = await window.ipc.invoke("get-user-data");
   if (!data || data.error || data.length === 0) {
     console.log(data.error);
     return;
@@ -17,8 +17,8 @@ async function getDataFromDB(user_param) {
   }
 }
 async function setNewServerIP(server_ip) {
-  ipcRenderer.send("update-server-ip", server_ip);
-  ipcRenderer.once("update-server-ip-err", (err) => {
+  window.ipc.send("update-server-ip", server_ip);
+  window.ipc.once("update-server-ip-err", (err) => {
     const toast = document.getElementById("toast-notification");
     toast.textContent = `Ошибка: ${err}`;
     toast.classList.remove("hidden");
@@ -28,7 +28,7 @@ async function setNewServerIP(server_ip) {
     }, 2000);
     // alert(err);
   });
-  ipcRenderer.once("update-server-ip-success", () => {
+  window.ipc.once("update-server-ip-success", () => {
     // alert("Успешно!");
     const toast = document.getElementById("toast-notification");
     toast.textContent = `Успешно!`;
