@@ -256,9 +256,9 @@ async function deleteBotByUsername(username) {
     const toast = document.getElementById("toast-notification");
     toast.textContent = `${data.result}`;
     toast.classList.remove("hidden");
+    renderBotNames();
     setTimeout(() => {
       toast.classList.add("hidden");
-      renderBotNames();
     }, 2000);
   });
 }

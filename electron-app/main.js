@@ -225,6 +225,7 @@ const createWindow = () => {
         {!data.new_ssh_bot_file_name.length == 0 || !data.new_ssh_bot_file_name == undefined ? new_ssh_bot_file_name = data.new_ssh_bot_file_name : new_ssh_bot_file_name=rows.bot_file_name} // prettier-ignore
         const new_data = { new_ssh_host, new_ssh_port, new_ssh_username, new_ssh_password, new_ssh_private_key, new_ssh_bot_dir, new_ssh_bot_name, new_ssh_bot_file_name}; // prettier-ignore
         console.log(new_data);
+
         db.run(
           `UPDATE bots SET ssh_host = ?, ssh_port = ?, ssh_username = ?, ssh_password = ?, ssh_private_key = ?, bot_dir = ?, bot_name = ?, bot_file_name = ? WHERE username = ?`, // prettier-ignore
           [new_ssh_host, new_ssh_port, new_ssh_username, new_ssh_password,new_ssh_private_key,new_ssh_bot_dir,new_ssh_bot_name,new_ssh_bot_file_name,bot_username], // prettier-ignore
@@ -249,19 +250,19 @@ const createWindow = () => {
   });
   ipcMain.on("delete-bot", (event, data) => {
     const bot_username = data.bot_username;
-    db.run(
-      `DELETE FROM bots WHERE username = ?`,
+    db.get(
+      "SELECT * FROM bots WHERE username = ?",
       [bot_username],
-      (err, resolve) => {
-        console.log(resolve);
-        if (err) {
-          console.log(err);
+      (err, rows) => {
+        if (!rows || !rows.username || rows == undefined) {
           event.reply("bot-deleted", {
             result: `Ошибка удаления бота: ${bot_username}!`,
           });
         } else {
-          event.reply("bot-deleted", {
-            result: `Бот ${bot_username} удален успешно!`,
+          db.run(`DELETE FROM bots WHERE username = ?`, [bot_username], () => {
+            event.reply("bot-deleted", {
+              result: `Бот ${bot_username} удален успешно!`,
+            });
           });
         }
       }
