@@ -18,7 +18,7 @@
   },
   "name": "electron-js-app",
   "version": "1.0.0",
-  "description": "",
+  "description": "Telegram-bot-manager",
   "main": "main.js",
   "dependencies": {
     "@tailwindcss/cli": "^4.1.18",
@@ -89,7 +89,11 @@
     "undici-types": "^6.21.0",
     "universalify": "^0.1.2",
     "wrappy": "^1.0.2",
-    "yauzl": "^2.10.0"
+    "yauzl": "^2.10.0",
+    "jquery": "^3.7.1"
+  },
+  "optionalDependencies": {
+    "@parcel/watcher": "*"
   },
   "scripts": {
     "start": "electron-forge start",

@@ -14,10 +14,6 @@ let win;
 let socket;
 const os = require("os");
 const os_username = os.userInfo().username;
-const { data, event } = require("jquery");
-
-// console.log();
-// let db;
 
 const createWindow = () => {
   const primaryDisplay = screen.getPrimaryDisplay();
@@ -40,10 +36,25 @@ const createWindow = () => {
     show: true,
     webPreferences: {
       preload: path.join(__dirname, "/src/js/preload.js"),
-      contextIsolation: false,
-      nodeIntegration: true,
+      contextIsolation: true,
+      nodeIntegration: false,
       // sandbox: true, // ← Рекомендуется добавить
     },
+  });
+  win.webContents.session.webRequest.onHeadersReceived((details, callback) => {
+    callback({
+      responseHeaders: {
+        ...details.responseHeaders,
+        "Content-Security-Policy": [
+          "default-src * data: blob:; " +
+            "script-src * 'unsafe-inline' 'unsafe-eval' data: blob:; " +
+            "connect-src * data: blob:; " +
+            "img-src * data: blob:; " +
+            "style-src * 'unsafe-inline' data: blob:; " +
+            "font-src * data: blob:;",
+        ],
+      },
+    });
   });
   function hideTray() {
     if (tray) {
@@ -359,6 +370,20 @@ const createWindow = () => {
       });
     });
   });
+  ipcMain.on("sync-bot-status", (event, { bots }) => {
+    db.serialize(() => {
+      // Обновляем статус каждого бота в БД
+      bots.forEach((bot) => {
+        db.run(
+          "UPDATE bots SET status = ? WHERE id = ?",
+          [bot.isRunning ? "active" : "inactive", bot.botId],
+          (err) => {
+            if (err) console.error("DB update error:", err);
+          }
+        );
+      });
+    });
+  });
   win.webContents.openDevTools();
 };
 
@@ -384,7 +409,7 @@ app.whenReady().then(() => {
   //   console.log(`Comman executes: ${data.command}`);
   //   win.webContents.send("command-result", data);
   // });
-  db.run(`UPDATE bots SET status = ?,socket_id = null`, ["inactive"], (err) => {
+  db.run(`UPDATE bots SET status = ?`, ["inactive"], (err) => {
     createWindow();
     win.loadFile(path.join(__dirname, "/pages/index.html"));
   });
