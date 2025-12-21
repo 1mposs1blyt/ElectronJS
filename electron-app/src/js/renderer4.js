@@ -165,7 +165,7 @@ async function renderBotEditingList(botname) {
               type="button"
               id="bot-edit-save"
               onclick="BotEditSave()"
-              class="btn btn-primary w-full max-w-sm"
+              class="btn btn-soft btn-primary w-full max-w-sm"
             >
               Сохранить
             </button>
@@ -201,7 +201,7 @@ async function renderBotEditingList(botname) {
   }
 }
 async function renderBotNames() {
-  $("#bot-current-edit").attr("hidden",true).empty();
+  $("#bot-current-edit").attr("hidden", true).empty();
   $("#bot-name-list").removeAttr("hidden");
   $("#bot-settings-edit").removeAttr("hidden");
   $("#bot-name-list").empty();
@@ -238,7 +238,30 @@ async function renderBotNames() {
     console.error("load-all-bots error:", e);
   }
 }
-
+async function deleteBotByUsername(username) {
+  if (!username || username.length == 0 || username == undefined) {
+    const toast = document.getElementById("toast-notification");
+    toast.textContent = `✗ Ошибка удаления бота!`;
+    toast.classList.remove("hidden");
+    setTimeout(() => {
+      toast.classList.add("hidden");
+    }, 2000);
+    return;
+  }
+  const data = {
+    bot_username: username,
+  };
+  ipcRenderer.send("delete-bot", data);
+  ipcRenderer.once("bot-deleted", (event, data) => {
+    const toast = document.getElementById("toast-notification");
+    toast.textContent = `${data.result}`;
+    toast.classList.remove("hidden");
+    setTimeout(() => {
+      toast.classList.add("hidden");
+      renderBotNames();
+    }, 2000);
+  });
+}
 document.addEventListener("DOMContentLoaded", async () => {
   await renderBotNames();
 });
@@ -248,5 +271,13 @@ document
     const input = $("#bot-edit-username");
     const username = input.val();
     await renderBotEditingList(username);
-    input.val("")
+    input.val("");
+  });
+document
+  .getElementById("bot-delete-by-username-send")
+  .addEventListener("click", async (e) => {
+    const input = $("#bot-edit-username");
+    const username = input.val();
+    await deleteBotByUsername(username);
+    input.val("");
   });

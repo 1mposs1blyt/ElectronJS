@@ -82,7 +82,7 @@
           class="skeleton-striped min-w-110 min-h-32 h-fit flex items-center flex-row select-none rounded-xl mb-3"
         >
           <div class="flex flex-col w-full items-center">
-            <div class="justify-center mb-4 min-w-96" id="bot-name">
+            <div class="justify-center mt-2 mb-4 min-w-96" id="bot-name">
               <span class="text-primary">Имя бота:</span>
               <input
                 type="text"
@@ -96,9 +96,16 @@
               <button
                 type="button"
                 id="bot-edit-username-send"
-                class="btn btn-primary w-full max-w-sm"
+                class="btn btn-soft btn-primary w-full max-w-sm mb-3"
               >
                 Изменить
+              </button>
+              <button
+                type="button"
+                id="bot-delete-by-username-send"
+                class="btn btn-soft btn-error w-full max-w-sm"
+              >
+                Удалить
               </button>
             </div>
           </div>

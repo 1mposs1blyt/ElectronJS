@@ -92,10 +92,11 @@
     "yauzl": "^2.10.0"
   },
   "scripts": {
-    "start": "electron .",
+    "start": "electron-forge start",
     "watch:css": "npx @tailwindcss/cli -i ./src/css/input.css -o ./src/css/output.css --watch",
     "package": "electron-forge package",
-    "make": "electron-forge make"
+    "make": "electron-forge make",
+    "devstart": "electron ."
   },
   "author": "alexandr",
   "license": "ISC"
