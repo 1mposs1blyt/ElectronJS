@@ -847,6 +847,96 @@
   .invisible {
     visibility: hidden;
   }
+  .switch {
+    border: var(--border) solid #0000;
+    color: var(--color-base-100);
+    position: relative;
+    display: inline-grid;
+    flex-shrink: 0;
+    cursor: pointer;
+    appearance: none;
+    place-content: center;
+    vertical-align: middle;
+    webkit-user-select: none;
+    user-select: none;
+    @media print {
+      outline: .25rem solid;
+    }
+    grid-template-columns: 0fr 1fr 1fr;
+    padding: var(--switch-p);
+    box-shadow: 0 1px currentColor inset;
+    @supports (color: color-mix(in lab, red, red)) {
+      box-shadow: 0 1px color-mix(in oklab, currentColor calc(var(--depth) * 10%), #0000) inset;
+    }
+    background-color: var(--input-color);
+    --radius-selector-max: calc(var(--radius-selector) + var(--radius-selector) + var(--radius-selector));
+    border-radius: calc( var(--radius-selector) + min(var(--switch-p), var(--radius-selector-max)) + min(var(--border), var(--radius-selector-max)) );
+    transition: color 0.3s, grid-template-columns 0.2s;
+    --input-color: var(--color-neutral);
+    @supports (color: color-mix(in lab, red, red)) {
+      --input-color: color-mix(in oklab, var(--color-neutral) 22%, #0000);
+    }
+    --switch-p: 0.1875rem;
+    --size: calc(var(--size-selector, 0.25rem) * 6);
+    width: calc((var(--size) * 2) - (var(--border) + var(--switch-p)) * 2);
+    height: var(--size);
+    &:before {
+      position: relative;
+      inset-inline-start: calc(0.25rem * 0);
+      grid-column-start: 2;
+      grid-row-start: 1;
+      aspect-ratio: 1 / 1;
+      height: 100%;
+      border-radius: var(--radius-selector);
+      background-color: currentColor;
+      @media print {
+        outline: .25rem solid;
+      }
+      @media print {
+        outline-offset: -1rem;
+      }
+      translate: 0;
+      --tw-content: "";
+      content: var(--tw-content);
+      transition: background-color 0.1s, translate 0.2s, inset-inline-start 0.2s;
+      box-shadow: 0 -1px oklch(59.99% 0 0 / calc(var(--depth) * 0.08)) inset, 0 8px 0 -4px oklch(59.99% 0 0 / calc(var(--depth) * 0.08)) inset, 0 1px 2px 0 oklch(0% 0 0 / 0.2);
+      background-size: auto, calc(var(--noise) * 100%);
+      background-image: none, var(--fx-noise);
+      @media (forced-colors: active) {
+        outline-style: var(--tw-outline-style);
+        outline-width: 1px;
+        outline-offset: calc(1px * -1);
+      }
+    }
+    &:focus-visible, &:has(:focus-visible) {
+      outline: 2px solid var(--input-color, var(--color-neutral));
+      @supports (color: color-mix(in lab, red, red)) {
+        outline: 2px solid color-mix(in oklab, var(--input-color, var(--color-neutral)) 30%, #0000);
+      }
+      outline-offset: 0px;
+    }
+    &:checked, &[aria-checked="true"], &:has(> input:checked) {
+      grid-template-columns: 1fr 1fr 0fr;
+      --input-color: var(--color-neutral);
+      background-color: var(--input-color);
+      &:before {
+        background-color: currentColor;
+        @starting-style {
+          opacity: 0;
+        }
+      }
+    }
+    &:indeterminate {
+      grid-template-columns: 0.5fr 1fr 0.5fr;
+    }
+    &:disabled {
+      cursor: not-allowed;
+      opacity: 50%;
+      &:before {
+        background-color: transparent;
+      }
+    }
+  }
   .table {
     position: relative;
     width: 100%;
@@ -2661,6 +2751,22 @@
         border-color: var(--color-error);
       }
       &:focus, &:focus-within {
+        --input-color: var(--color-error);
+      }
+    }
+  }
+  .switch {
+    &.is-valid, &:has(.is-valid), .validate &:valid, .validate &:has(:valid) {
+      --input-color: var(--color-success);
+      border-color: var(--input-color);
+      &:checked, &[aria-checked="true"], &:has(> input:checked) {
+        --input-color: var(--color-success);
+      }
+    }
+    &.is-invalid, &:has(.is-invalid), .validate &:invalid, .validate &:has(:invalid) {
+      --input-color: var(--color-error);
+      border-color: var(--input-color);
+      &:checked, &[aria-checked="true"], &:has(> input:checked) {
         --input-color: var(--color-error);
       }
     }

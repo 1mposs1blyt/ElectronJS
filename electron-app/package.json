@@ -55,6 +55,7 @@
     "has-property-descriptors": "^1.0.2",
     "http-cache-semantics": "^4.2.0",
     "http2-wrapper": "^1.0.3",
+    "jquery": "^3.7.1",
     "json-buffer": "^3.0.1",
     "json-stringify-safe": "^5.0.1",
     "jsonfile": "^4.0.0",
@@ -89,8 +90,7 @@
     "undici-types": "^6.21.0",
     "universalify": "^0.1.2",
     "wrappy": "^1.0.2",
-    "yauzl": "^2.10.0",
-    "jquery": "^3.7.1"
+    "yauzl": "^2.10.0"
   },
   "optionalDependencies": {
     "@parcel/watcher": "*"
