@@ -1,32 +1,31 @@
 {
-  "name": "my-electron-app",
+  "name": "telegram-bot-manager",
   "version": "1.0.0",
-  "description": "My Electron App",
+  "description": "Бот-менеджер для телеграм ботов, можно запускать удаленных ботов",
   "main": "main.js",
-  "author": "Alexandr_B",
+  "author": "Alexandr_B <your.email@example.com>",
   "license": "MIT",
+  "homepage": "https://example.com",
   "scripts": {
     "start": "electron-forge start",
     "make": "electron-forge make",
     "make:win": "electron-forge make --platform win32",
     "make:mac": "electron-forge make --platform darwin",
-    "make:linux": "electron-forge make --platform linux",
-    "make:all": "electron-forge make --platform win32 --platform darwin --platform linux"
+    "make:linux": "electron-forge make --platform linux"
   },
   "devDependencies": {
     "@electron-forge/cli": "^7.2.0",
     "@electron-forge/maker-deb": "^7.2.0",
-    "@electron-forge/maker-dmg": "^7.10.2",
+    "@electron-forge/maker-dmg": "^7.2.0",
     "@electron-forge/maker-squirrel": "^7.2.0",
     "@electron-forge/maker-zip": "^7.2.0",
-    "electron": "^27.0.0",
-    "electron-icon-builder": "^2.0.1"
+    "electron": "^27.0.0"
   },
   "config": {
     "forge": {
       "packagerConfig": {
-        "name": "MyApp",
-        "productName": "My Electron App",
+        "name": "TelegramBotManager",
+        "productName": "Telegram Bot Manager",
         "asar": true,
         "icon": "assets/icons/icon"
       },
@@ -34,25 +33,80 @@
         {
           "name": "@electron-forge/maker-squirrel",
           "config": {
-            "name": "MyElectronApp",
-            "setupIcon": "assets/icons/icon.ico"
+            "name": "TelegramBotManager",
+            "setupIcon": "assets/icons/icon.ico",
+            "iconUrl": "https://example.com/icon.ico",
+            "nsis": {
+              "oneClick": true,
+              "allowToChangeInstallationDirectory": true,
+              "createDesktopShortcut": true,
+              "createStartMenuShortcut": true,
+              "shortcutName": "Telegram Bot Manager",
+              "installerIcon": "assets/icons/installer-icon.ico",
+              "uninstallerIcon": "assets/icons/uninstaller-icon.ico",
+              "installerHeader": "assets/icons/installer-header.png",
+              "installerSidebar": "assets/icons/installer-sidebar.png",
+              "installerLanguages": [
+                "en_US",
+                "ru_RU"
+              ],
+              "license": "LICENSE.txt",
+              "signWithParams": ""
+            }
           }
         },
         {
           "name": "@electron-forge/maker-dmg",
           "config": {
-            "icon": "assets/icons/icon.icns"
+            "background": "assets/icons/dmg-background.png",
+            "format": "ULFO",
+            "window": {
+              "width": 540,
+              "height": 360
+            },
+            "icon": "assets/icons/icon.icns",
+            "iconSize": 128,
+            "contents": [
+              {
+                "x": 130,
+                "y": 220,
+                "type": "file"
+              },
+              {
+                "x": 438,
+                "y": 220,
+                "type": "link",
+                "path": "/Applications"
+              }
+            ]
           }
         },
         {
           "name": "@electron-forge/maker-deb",
           "config": {
             "options": {
-              "icon": "assets/icons/icon.png"
+              "maintainer": "Alexandr_B <your.email@example.com>",
+              "homepage": "https://example.com",
+              "icon": "assets/icons/icon.png",
+              "category": "Utility",
+              "synopsis": "Telegram Bot Manager",
+              "description": "Manage and control your Telegram bots remotely via SSH"
             }
           }
+        },
+        {
+          "name": "@electron-forge/maker-zip",
+          "platforms": [
+            "darwin",
+            "linux"
+          ]
         }
       ]
     }
+  },
+  "dependencies": {
+    "better-sqlite3": "^12.5.0",
+    "socket.io-client": "^4.8.1",
+    "sqlite3": "^5.1.7"
   }
 }
