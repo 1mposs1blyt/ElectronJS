@@ -27,11 +27,12 @@ const connectedClients = new Map();
 const remoteBots = new Map(); // Map<botName, { isRunning, config, etc }>
 
 // ============ SOCKET.IO EVENTS ============
-let botIds = [];
+
 io.on("connection", (socket) => {
   console.log("[SERVER] client connected", socket.id);
 
   socket.on("bot-alive", async (botId) => {
+    let botIds = [];
     if (!botIds.includes(botId)) {
       botIds.push(botId); // Добавится
     }
