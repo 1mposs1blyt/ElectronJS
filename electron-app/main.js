@@ -34,6 +34,7 @@ const createWindow = () => {
     y: y_pos,
     alwaysOnTop: true,
     show: true,
+    icon: path.join(__dirname, "./assets/icon.png"),
     webPreferences: {
       preload: path.join(__dirname, "/src/js/preload.js"),
       contextIsolation: true,
@@ -56,6 +57,9 @@ const createWindow = () => {
       },
     });
   });
+  // if (process.env.NODE_ENV === "development") {
+  //   mainWindow.webContents.openDevTools();
+  // }
   function hideTray() {
     if (tray) {
       tray.destroy();

@@ -100,7 +100,32 @@
     "watch:css": "npx @tailwindcss/cli -i ./src/css/input.css -o ./src/css/output.css --watch",
     "package": "electron-forge package",
     "make": "electron-forge make",
-    "devstart": "electron ."
+    "devstart": "electron .",
+    "publish": "electron-forge publish"
+  },
+  "config": {
+    "forge": {
+      "packagerConfig": {
+        "icon": "assets/icons/icon"
+      },
+      "makers": [
+        {
+          "name": "@electron-forge/maker-squirrel",
+          "config": {
+            "setupIcon": "assets/icons/installer-icon.ico"
+          }
+        },
+        {
+          "name": "@electron-forge/maker-zip",
+          "platforms": [
+            "darwin"
+          ]
+        },
+        {
+          "name": "@electron-forge/maker-deb"
+        }
+      ]
+    }
   },
   "author": "alexandr",
   "license": "ISC"
