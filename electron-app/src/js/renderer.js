@@ -36,7 +36,7 @@ async function renderBots() {
           <div class="skeleton-striped w-125 h-auto min-h-fit flex items-center flex-row select-none rounded-xl mb-3">
           <div class="h-18 w-18 rounded-full ml-4">
             <img class="" src="./../images/icon2.png" alt="img got lost =(" />
-            <p hidden id="${[i]}"></p>
+            <p hidden id="${data[i].id}" data-bot-id="${data[i].id}"></p>
           </div>
           <div class="ml-4">
             <div class="text-primary" id="bot-name">${data[i].name}</div>
@@ -183,13 +183,21 @@ function remote_bot_start(el) {
           renderBots();
         } else {
           console.error("✗ Ошибка запуска:", response.error);
+
           const toast = document.getElementById("toast-notification");
           toast.textContent = `✗ Ошибка: ${response.error}`;
           toast.classList.remove("hidden");
+          window.ipc.send("update-bot-status", {
+            botId: botId,
+            status: "active",
+          });
+          window.ipc.once("bot-status-updated", () => {
+            renderBots();
+            setTimeout(() => {
+              toast.classList.add("hidden");
+            }, 2000);
+          });
 
-          setTimeout(() => {
-            toast.classList.add("hidden");
-          }, 2000);
           // alert(`✗ Ошибка: ${response.error}`);
         }
       }
@@ -231,30 +239,33 @@ function remote_bot_stop(el) {
         el.textContent = "SSH: стоп";
 
         if (response.success) {
-          console.log("✓ Удалённый бот остановлен");
-          // alert("✓ Удалённый бот остановлен");
-
-          const toast = document.getElementById("toast-notification");
-          toast.textContent = `✓ Удалённый бот остановлен`;
-          toast.classList.remove("hidden");
-
-          setTimeout(() => {
-            toast.classList.add("hidden");
-          }, 2000);
-
           window.ipc.send("update-bot-status", {
             botId: botId,
             status: "inactive",
           });
           window.ipc.once("bot-status-updated", () => {});
           renderBots();
+          console.log("✓ Удалённый бот остановлен");
+          // alert("✓ Удалённый бот остановлен");
+
+          const toast = document.getElementById("toast-notification");
+          toast.textContent = `✓ Удалённый бот остановлен`;
+          toast.classList.remove("hidden");
+          setTimeout(() => {
+            toast.classList.add("hidden");
+          }, 2000);
         } else {
           console.error("✗ Ошибка остановки:", response.error);
           // alert(`✗ Ошибка: ${response.error}`);
           const toast = document.getElementById("toast-notification");
           toast.textContent = `✗ Ошибка: ${response.error}`;
           toast.classList.remove("hidden");
-
+          window.ipc.send("update-bot-status", {
+            botId: botId,
+            status: "inactive",
+          });
+          window.ipc.once("bot-status-updated", () => {});
+          renderBots();
           setTimeout(() => {
             toast.classList.add("hidden");
           }, 2000);
@@ -269,7 +280,31 @@ function remote_bot_stop(el) {
   console.log("server_ip:", server_ip);
 
   socket = io(server_ip); // <-- ГЛОБАЛЬНАЯ переменная
+  function checkAllBots() {
+    console.log("[SOCKET]check-all-bots");
+    socket.emit("check-all-bots");
+  }
+  checkAllBots();
+  setInterval(() => {
+    checkAllBots();
+  }, 30000);
+  await socket.on("bot-alive-id", async (botIds) => {
+    for (let i = 0; i < botIds.length; i++) {
+      await window.ipc.send("update-bot-status", {
+        botId: botIds[i],
+        status: "active",
+      });
+    }
+    console.log("Bot is alive! id:", botIds);
 
+    const toast = document.getElementById("toast-notification");
+    toast.textContent = `Список ботов обновлен!`;
+    toast.classList.remove("hidden");
+    setTimeout(() => {
+      toast.classList.add("hidden");
+      renderBots();
+    }, 2000);
+  });
   socket.on("bot-register", (data) => {
     console.log("[RENDERER] bot-register", data);
     window.ipc.send("update-bot-status", {
@@ -280,7 +315,6 @@ function remote_bot_stop(el) {
     window.ipc.once("bot-status-updated", () => {});
     renderBots();
   });
-
   socket.on("bot-disconnected", (data) => {
     console.log("[RENDERER] bot-disconnected", data);
     const botId = data.botId.split("bot_")[1];
@@ -292,15 +326,34 @@ function remote_bot_stop(el) {
     window.ipc.once("bot-status-updated", () => {});
     renderBots();
   });
-
+  // socket.emit("AliveBots")
+  // Отправлять отсюда socket.emit("is-bot-alive") каждые N секунд +
+  // На сервере отправлять это в бота
+  // Всем ботам ставить статус Неактивен и потом ставить статус активен только тем у кого статус=Активен
+  // Если ответ от бота есть:
+  //   отправлять его обратно на сервер
+  //   с сервера отправлять результат сюда (id бота,статус=Активен)
+  //     менять боту статус в бд
+  //     renderBots()
+  // Иначе:
+  //  с сервера отправлять ответ о том что бот не запущен
+  //  менять боту статус в бд
+  //  renderBots()
   socket.on("bot-timer-update", (data) => {
     console.log("[RENDERER] bot-timer-update", data);
+    console.log($(`${data.botId}`));
     window.ipc.send("update-bot-status", {
       botId: data.botId,
       status: "active",
-      process: data.process,
     });
-    window.ipc.once("bot-status-updated", () => {});
-    renderBots();
+    window.ipc.once("bot-status-updated", () => {
+      const toast = document.getElementById("toast-notification");
+      toast.textContent = `Список ботов обновлен!`;
+      toast.classList.remove("hidden");
+      renderBots();
+      setTimeout(() => {
+        toast.classList.add("hidden");
+      }, 2000);
+    });
   });
 })();

@@ -32,8 +32,15 @@ socket.on("disconnect", (BOT_NAME) => {
 socket.on("error", (error) => {
   console.error(`✗ [${BOT_NAME}] Ошибка Socket.IO:`, error);
 });
+socket.on("is-alive", (err) => {
+  console.log("[BOT] is-alive=true");
+  const botId = process.env.BOT_TOKEN.split(":")[0];
+  console.log(botId);
+  socket.emit("bot-alive", botId);
+});
 // ============ IsAlive function ============
 async function isAlive(bot, BOT_NAME) {
+  console.log("[isAlive] send!");
   bot.telegram.getMe().then((me) => {
     socket.emit("bot-timer-update", {
       botId: me.id,

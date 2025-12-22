@@ -27,11 +27,23 @@ const connectedClients = new Map();
 const remoteBots = new Map(); // Map<botName, { isRunning, config, etc }>
 
 // ============ SOCKET.IO EVENTS ============
-
+let botIds = [];
 io.on("connection", (socket) => {
   console.log("[SERVER] client connected", socket.id);
 
+  socket.on("bot-alive", async (botId) => {
+    if (!botIds.includes(botId)) {
+      botIds.push(botId); // Добавится
+    }
+    console.log(botIds);
+
+    io.emit("bot-alive-id", botIds);
+  });
   // ========== УПРАВЛЕНИЕ УДАЛЁННЫМ БОТОМ ==========
+  socket.on("check-all-bots", async (data, callback) => {
+    console.log("[SERVER] check-all-bots");
+    socket.broadcast.emit("is-alive");
+  });
 
   socket.on("remote-bot:start", async (data, callback) => {
     console.log("[SERVER] remote-bot:start requested", data);
@@ -375,7 +387,7 @@ app.get("/api/remote-bot/status", (req, res) => {
 
 // ============ ЗАПУСК ============
 
-const PORT = process.env.PORT || 2999;
+const PORT = process.env.PORT || 3000;
 
 server.listen(PORT, () => {
   console.log(`✓ Сервер запущен на http://localhost:${PORT}`);

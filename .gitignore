@@ -1,7 +1,8 @@
 # Dependencies
 node_modules/
 /jspm_packages/
-
+/.vs
+/electron-app/out
 # Optional npm cache files
 .npm
 
