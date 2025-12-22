@@ -3,6 +3,7 @@ node_modules/
 /jspm_packages/
 /.vs
 /electron-app/out
+/.github
 # Optional npm cache files
 .npm
 
