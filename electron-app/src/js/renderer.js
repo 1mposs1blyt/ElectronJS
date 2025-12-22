@@ -288,21 +288,19 @@ function remote_bot_stop(el) {
   setInterval(() => {
     checkAllBots();
   }, 30000);
-  await socket.on("bot-alive-id", async (botIds) => {
-    for (let i = 0; i < botIds.length; i++) {
-      await window.ipc.send("update-bot-status", {
-        botId: botIds[i],
-        status: "active",
-      });
-    }
-    console.log("Bot is alive! id:", botIds);
+  await socket.on("bot-alive-id", async (botId) => {
+    await window.ipc.send("update-bot-status", {
+      botId: botId,
+      status: "active",
+    });
+    console.log("Bot is alive! id:", botId);
 
     const toast = document.getElementById("toast-notification");
     toast.textContent = `Список ботов обновлен!`;
     toast.classList.remove("hidden");
+    renderBots();
     setTimeout(() => {
       toast.classList.add("hidden");
-      renderBots();
     }, 2000);
   });
   socket.on("bot-register", (data) => {

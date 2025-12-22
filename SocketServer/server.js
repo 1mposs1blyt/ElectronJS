@@ -32,13 +32,7 @@ io.on("connection", (socket) => {
   console.log("[SERVER] client connected", socket.id);
 
   socket.on("bot-alive", async (botId) => {
-    let botIds = [];
-    if (!botIds.includes(botId)) {
-      botIds.push(botId); // Добавится
-    }
-    console.log(botIds);
-
-    io.emit("bot-alive-id", botIds);
+    io.emit("bot-alive-id", botId);
   });
   // ========== УПРАВЛЕНИЕ УДАЛЁННЫМ БОТОМ ==========
   socket.on("check-all-bots", async (data, callback) => {

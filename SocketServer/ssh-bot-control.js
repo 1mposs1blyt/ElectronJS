@@ -115,6 +115,8 @@ async function startBot(botDir, botName, sshConfig) {
 async function stopBot(botDir, botName, sshConfig) {
   const CHECK_CMD = `npx pm2 describe ${botName}`;
   const pm2_status = await CheckPM2Process(CHECK_CMD, sshConfig);
+  console.log({ botDir, botName });
+  console.log(sshConfig);
   if (pm2_status.code == 0) {
     console.log("Bot stopped successful!");
     //  cd ${botDir} &&

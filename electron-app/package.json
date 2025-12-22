@@ -11,15 +11,34 @@
     "make": "electron-forge make",
     "make:win": "electron-forge make --platform win32",
     "make:mac": "electron-forge make --platform darwin",
-    "make:linux": "electron-forge make --platform linux"
+    "make:linux": "electron-forge make --platform linux",
+    "watch:css": "npx @tailwindcss/cli -i ./src/css/input.css -o ./src/css/output.css --watch",
+    "dev": "npm run watch:css & npm start"
   },
   "devDependencies": {
-    "@electron-forge/cli": "^7.2.0",
-    "@electron-forge/maker-deb": "^7.2.0",
-    "@electron-forge/maker-dmg": "^7.2.0",
-    "@electron-forge/maker-squirrel": "^7.2.0",
-    "@electron-forge/maker-zip": "^7.2.0",
-    "electron": "^27.0.0"
+    "@electron-forge/cli": "^7.10.2",
+    "@electron-forge/maker-deb": "^7.10.2",
+    "@electron-forge/maker-squirrel": "^7.10.2",
+    "@electron-forge/maker-zip": "^7.10.2",
+    "@electron-forge/plugin-auto-unpack-natives": "^7.10.2",
+    "@electron-forge/plugin-fuses": "^7.10.2",
+    "@electron/fuses": "^1.8.0",
+    "@iconify/json": "^2.2.418",
+    "@iconify/tailwind4": "^1.2.0",
+    "electron": "^39.2.7",
+    "electron-debug": "^4.1.0",
+    "electron-rebuild": "^3.2.9",
+    "flyonui": "^2.4.1",
+    "jquery": "^3.7.1"
+  },
+  "dependencies": {
+    "@iconify-json/line-md": "^1.2.11",
+    "@iconify-json/tabler": "^1.2.24",
+    "@iconify/tailwind4": "^1.2.0",
+    "better-sqlite3": "^12.5.0",
+    "flyonui": "^2.4.1",
+    "socket.io-client": "^4.8.1",
+    "sqlite3": "^5.1.7"
   },
   "config": {
     "forge": {
@@ -35,78 +54,35 @@
           "config": {
             "name": "TelegramBotManager",
             "setupIcon": "assets/icons/icon.ico",
-            "iconUrl": "https://example.com/icon.ico",
             "nsis": {
-              "oneClick": true,
+              "oneClick": false,
               "allowToChangeInstallationDirectory": true,
               "createDesktopShortcut": true,
               "createStartMenuShortcut": true,
-              "shortcutName": "Telegram Bot Manager",
-              "installerIcon": "assets/icons/installer-icon.ico",
-              "uninstallerIcon": "assets/icons/uninstaller-icon.ico",
+              "installerIcon": "assets/icons/icon.ico",
+              "uninstallerIcon": "assets/icons/icon.ico",
               "installerHeader": "assets/icons/installer-header.png",
               "installerSidebar": "assets/icons/installer-sidebar.png",
+              "installerTitle": "Telegram Bot Manager Setup",
+              "uninstallerTitle": "Telegram Bot Manager Uninstall",
               "installerLanguages": [
                 "en_US",
                 "ru_RU"
               ],
-              "license": "LICENSE.txt",
-              "signWithParams": ""
-            }
-          }
-        },
-        {
-          "name": "@electron-forge/maker-dmg",
-          "config": {
-            "background": "assets/icons/dmg-background.png",
-            "format": "ULFO",
-            "window": {
-              "width": 540,
-              "height": 360
-            },
-            "icon": "assets/icons/icon.icns",
-            "iconSize": 128,
-            "contents": [
-              {
-                "x": 130,
-                "y": 220,
-                "type": "file"
-              },
-              {
-                "x": 438,
-                "y": 220,
-                "type": "link",
-                "path": "/Applications"
-              }
-            ]
-          }
-        },
-        {
-          "name": "@electron-forge/maker-deb",
-          "config": {
-            "options": {
-              "maintainer": "Alexandr_B <your.email@example.com>",
-              "homepage": "https://example.com",
-              "icon": "assets/icons/icon.png",
-              "category": "Utility",
-              "synopsis": "Telegram Bot Manager",
-              "description": "Manage and control your Telegram bots remotely via SSH"
+              "defaultInstallFolder": "$PROGRAMFILES\\TelegramBotManager",
+              "shortcutName": "Telegram Bot Manager",
+              "multiLanguageInstaller": true,
+              "license": "LICENSE.txt"
             }
           }
         },
         {
           "name": "@electron-forge/maker-zip",
           "platforms": [
-            "darwin",
-            "linux"
+            "win32"
           ]
         }
       ]
     }
-  },
-  "dependencies": {
-    "better-sqlite3": "^12.5.0",
-    "socket.io-client": "^4.8.1",
-    "sqlite3": "^5.1.7"
   }
 }

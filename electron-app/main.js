@@ -29,7 +29,7 @@ const createWindow = () => {
     height: windowHeight,
     minWidth: windowWidth,
     minHeight: windowHeight,
-    resizable: false,
+    resizable: true,
     x: x_pos,
     y: y_pos,
     alwaysOnTop: true,
@@ -58,7 +58,7 @@ const createWindow = () => {
     });
   });
   // if (process.env.NODE_ENV === "development") {
-  //   mainWindow.webContents.openDevTools();
+  win.webContents.openDevTools();
   // }
   function hideTray() {
     if (tray) {
