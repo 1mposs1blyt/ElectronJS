@@ -1,0 +1,42 @@
+{
+  "config": {
+    "forge": {
+      "packagerConfig": {
+        "name": "TelegramBotManager",
+        "productName": "Telegram Bot Manager",
+        "asar": true,
+        "icon": "assets/icons/icon"
+      },
+      "makers": [
+        {
+          "name": "@electron-forge/maker-squirrel",
+          "config": {
+            "name": "TelegramBotManager",
+            "setupIcon": "assets/icons/icon.ico",
+            "nsis": {
+              "oneClick": false,
+              "allowToChangeInstallationDirectory": true,
+              "createDesktopShortcut": true,
+              "createStartMenuShortcut": true,
+              "installerIcon": "assets/icons/icon.ico",
+              "uninstallerIcon": "assets/icons/icon.ico",
+              "installerHeader": "assets/icons/installer-header.png",
+              "installerSidebar": "assets/icons/installer-sidebar.png",
+              "installerTitle": "Telegram Bot Manager Setup",
+              "uninstallerTitle": "Telegram Bot Manager Uninstall",
+              "installerLanguages": ["en_US", "ru_RU"],
+              "defaultInstallFolder": "$PROGRAMFILES\\TelegramBotManager",
+              "shortcutName": "Telegram Bot Manager",
+              "multiLanguageInstaller": true,
+              "license": "LICENSE.txt"
+            }
+          }
+        },
+        {
+          "name": "@electron-forge/maker-zip",
+          "platforms": ["win32"]
+        }
+      ]
+    }
+  }
+}

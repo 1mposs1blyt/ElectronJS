@@ -8,14 +8,22 @@ const {
 } = require("electron/main");
 const path = require("node:path");
 const { db, dbPath } = require("./src/js/databases");
-const { io: ioClient } = require("socket.io-client");
+// const { io: ioClient } = require("socket.io-client");
 let tray = null;
 let win;
 let socket;
 const os = require("os");
 const os_username = os.userInfo().username;
 
+if (require("electron-squirrel-startup")) app.quit();
+
 const createWindow = () => {
+  if (win) {
+    // Если окно уже есть, просто фокусируемся на нем
+    if (win.isMinimized()) win.restore();
+    win.focus();
+    return; // Выходим, чтобы не создавать новое
+  }
   const primaryDisplay = screen.getPrimaryDisplay();
   const { width: screenWidth, height: screenHeight } =
     primaryDisplay.workAreaSize;
@@ -29,12 +37,12 @@ const createWindow = () => {
     height: windowHeight,
     minWidth: windowWidth,
     minHeight: windowHeight,
-    resizable: true,
+    resizable: false,
     x: x_pos,
     y: y_pos,
     alwaysOnTop: true,
-    show: true,
-    icon: path.join(__dirname, "./assets/icon.png"),
+    show: false,
+    icon: path.join(__dirname, "/assets/icons/icon.png"),
     webPreferences: {
       preload: path.join(__dirname, "/src/js/preload.js"),
       contextIsolation: true,
@@ -58,7 +66,7 @@ const createWindow = () => {
     });
   });
   // if (process.env.NODE_ENV === "development") {
-  win.webContents.openDevTools();
+    win.webContents.openDevTools();
   // }
   function hideTray() {
     if (tray) {
@@ -68,7 +76,7 @@ const createWindow = () => {
   }
   function showTray() {
     if (!tray) {
-      const iconPath = path.join(__dirname, "/assets/icons/icon.ico");
+      const iconPath = path.join(__dirname, "assets/icons/icon.ico");
       tray = new Tray(iconPath);
       const contextMenu = Menu.buildFromTemplate([
         {
@@ -97,11 +105,14 @@ const createWindow = () => {
   // ========================================================= //
   ipcMain.on("close-app", (e) => {
     // win.close(); // Закрыть текущее окно
-    if (!app.isQuitting) {
-      e.preventDefault();
-      showTray();
-      win.hide();
-    }
+    win = null;
+    app.quit();
+
+    // if (!app.isQuitting) {
+    //   e.preventDefault();
+    //   showTray();
+    //   win.hide();
+    // }
     return false;
   });
   ipcMain.on("minimize-app", () => {
@@ -413,9 +424,15 @@ app.whenReady().then(() => {
   //   console.log(`Comman executes: ${data.command}`);
   //   win.webContents.send("command-result", data);
   // });
+  // app.on("activate", () => {
+  //   if (BrowserWindow.getAllWindows().length === 0) {
+  //     createWindow(); // Создаем новое, если все окна закрыты
+  //   }
+  // });
   db.run(`UPDATE bots SET status = ?`, ["inactive"], (err) => {
     createWindow();
     win.loadFile(path.join(__dirname, "/pages/index.html"));
+    win.show();
   });
 });
 

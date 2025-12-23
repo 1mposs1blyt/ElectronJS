@@ -41,8 +41,8 @@ function BotEditSave() {
     toast.classList.remove("hidden");
     setTimeout(() => {
       toast.classList.add("hidden");
-      renderBotNames();
     }, 2000);
+    renderBotNames();
   });
 }
 

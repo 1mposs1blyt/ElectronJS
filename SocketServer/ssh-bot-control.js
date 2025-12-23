@@ -1,5 +1,6 @@
 // ssh-bot-control.js
 const { Client } = require("ssh2");
+const pm2 = require("pm2");
 
 function runRemoteCommand(command, sshConfig, botDir) {
   return new Promise((resolve, reject) => {
@@ -131,5 +132,4 @@ async function stopBot(botDir, botName, sshConfig) {
     };
   }
 }
-
 module.exports = { startBot, stopBot };

@@ -1,9 +1,10 @@
 {
   "name": "telegram-bot-manager",
+  "productName": "Telegram bot-manager",
   "version": "1.0.0",
   "description": "Бот-менеджер для телеграм ботов, можно запускать удаленных ботов",
   "main": "main.js",
-  "author": "Alexandr_B <your.email@example.com>",
+  "author": "Alexandr_B",
   "license": "MIT",
   "homepage": "https://example.com",
   "scripts": {
@@ -13,7 +14,8 @@
     "make:mac": "electron-forge make --platform darwin",
     "make:linux": "electron-forge make --platform linux",
     "watch:css": "npx @tailwindcss/cli -i ./src/css/input.css -o ./src/css/output.css --watch",
-    "dev": "npm run watch:css & npm start"
+    "dev": "npm run watch:css & npm start",
+    "rebuild": "npx electron-rebuild --platform win32"
   },
   "devDependencies": {
     "@electron-forge/cli": "^7.10.2",
@@ -36,6 +38,7 @@
     "@iconify-json/tabler": "^1.2.24",
     "@iconify/tailwind4": "^1.2.0",
     "better-sqlite3": "^12.5.0",
+    "electron-squirrel-startup": "^1.0.1",
     "flyonui": "^2.4.1",
     "socket.io-client": "^4.8.1",
     "sqlite3": "^5.1.7"
@@ -48,39 +51,27 @@
         "asar": true,
         "icon": "assets/icons/icon"
       },
+      "rebuildConfig": {},
+      "publishers": [],
+      "plugins": [],
+      "hooks": {},
+      "buildIdentifier": "TelegramBotManager",
+      "outDir": "./../dist/",
       "makers": [
         {
           "name": "@electron-forge/maker-squirrel",
           "config": {
-            "name": "TelegramBotManager",
+            "iconUrl": "https://imagetostl.com/Api/V1/Download/Get/8c7a7a0c-f750-424b-8582-2e1f7ec8e2d0/d58f427c-f2ed-4fde-886a-2c6c048f5739/639020646651824712",
+            "shortcutName": "Telegram Bot Manager",
+            "createDesktopShortcut": true,
+            "createStartMenuShortcut": true,
             "setupIcon": "assets/icons/icon.ico",
-            "nsis": {
-              "oneClick": false,
-              "allowToChangeInstallationDirectory": true,
-              "createDesktopShortcut": true,
-              "createStartMenuShortcut": true,
-              "installerIcon": "assets/icons/icon.ico",
-              "uninstallerIcon": "assets/icons/icon.ico",
-              "installerHeader": "assets/icons/installer-header.png",
-              "installerSidebar": "assets/icons/installer-sidebar.png",
-              "installerTitle": "Telegram Bot Manager Setup",
-              "uninstallerTitle": "Telegram Bot Manager Uninstall",
-              "installerLanguages": [
-                "en_US",
-                "ru_RU"
-              ],
-              "defaultInstallFolder": "$PROGRAMFILES\\TelegramBotManager",
-              "shortcutName": "Telegram Bot Manager",
-              "multiLanguageInstaller": true,
-              "license": "LICENSE.txt"
-            }
+            "installerTitle": "Telegram Bot Manager Setup",
+            "uninstallerTitle": "Telegram Bot Manager Uninstall"
           }
         },
         {
-          "name": "@electron-forge/maker-zip",
-          "platforms": [
-            "win32"
-          ]
+          "name": "@electron-forge/maker-zip"
         }
       ]
     }

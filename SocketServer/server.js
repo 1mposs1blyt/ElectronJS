@@ -28,18 +28,18 @@ const remoteBots = new Map(); // Map<botName, { isRunning, config, etc }>
 
 // ============ SOCKET.IO EVENTS ============
 
-io.on("connection", (socket) => {
+io.on("connection", async (socket) => {
   console.log("[SERVER] client connected", socket.id);
-
-  socket.on("bot-alive", async (botId) => {
+  socket.on("bot-alive", (botId) => {
+    console.log(botId);
     io.emit("bot-alive-id", botId);
   });
+
   // ========== УПРАВЛЕНИЕ УДАЛЁННЫМ БОТОМ ==========
-  socket.on("check-all-bots", async (data, callback) => {
+  socket.on("check-all-bots", (data, callback) => {
     console.log("[SERVER] check-all-bots");
     socket.broadcast.emit("is-alive");
   });
-
   socket.on("remote-bot:start", async (data, callback) => {
     console.log("[SERVER] remote-bot:start requested", data);
 
@@ -116,20 +116,11 @@ io.on("connection", (socket) => {
       console.error(`[SSH] Ошибка запуска бота "${data.botName}":`, e.message);
     }
   });
-
   socket.on("remote-bot:stop", async (data, callback) => {
     console.log("[SERVER] remote-bot:stop requested", data);
 
     // Проверяем, запущен ли этот бот
     const remoteBot = remoteBots.get(data.botName);
-    if (!remoteBot || !remoteBot.isRunning) {
-      callback({
-        success: false,
-        error: `Бот "${data.botName}" не запущен`,
-      });
-      return;
-    }
-
     // Используем сохранённый конфиг
     const sshConfig = data.sshConfig || remoteBot.config;
 
@@ -190,7 +181,6 @@ io.on("connection", (socket) => {
       );
     }
   });
-
   socket.on("remote-bot:status", (data, callback) => {
     const remoteBot = remoteBots.get(data.botName);
 
@@ -201,9 +191,7 @@ io.on("connection", (socket) => {
       lastError: remoteBot?.lastError,
     });
   });
-
   // ========== УПРАВЛЕНИЕ ЛОКАЛЬНЫМИ БОТАМИ ==========
-
   socket.on("stop-bot", async (data, callback) => {
     console.log("[SERVER] stop-bot requested for:", data.botId);
 
@@ -223,7 +211,6 @@ io.on("connection", (socket) => {
 
     callback({ success: true, message: "Bot is stopping..." });
   });
-
   socket.on("start-bot", async (data, callback) => {
     console.log("Start bot:", data.botId);
 
@@ -236,12 +223,10 @@ io.on("connection", (socket) => {
 
     callback({ success: true });
   });
-
   socket.on("bot-timer-update", (data) => {
     console.log("[SERVER] bot-timer-update", data);
     io.emit("bot-timer-update", data);
   });
-
   socket.on("bot-register", (data) => {
     console.log("[SERVER] bot-register", data);
     botSessions.set(data.botId, {
@@ -263,17 +248,14 @@ io.on("connection", (socket) => {
 
     console.log(`[Bot] Бот зарегистрирован: @${data.username}`);
   });
-
   socket.on("bot-update", (data) => {
     console.log("[SERVER] bot-update", data);
     io.emit("bot-update", data);
   });
-
   socket.on("bot-disconnected", (data) => {
     console.log("[SERVER] bot-disconnected", data);
     io.emit("bot-disconnected", data);
   });
-
   socket.on("register", (data) => {
     connectedClients.set(socket.id, {
       clientId: data.clientId,
@@ -290,7 +272,6 @@ io.on("connection", (socket) => {
 
     console.log(`[Socket] Клиент зарегистрирован: ${data.name}`);
   });
-
   socket.on("disconnect", () => {
     console.log(`[Socket] Клиент отключился: ${socket.id}`);
 
@@ -327,7 +308,6 @@ io.on("connection", (socket) => {
       });
     }
   });
-
   socket.on("error", (data) => {
     console.error(`[Error] ${data.botName}: ${data.error}`);
     io.emit("bot-error", {
@@ -337,9 +317,7 @@ io.on("connection", (socket) => {
     });
   });
 });
-
 // ============ REST API ============
-
 app.get("/api/status", (req, res) => {
   res.json({
     server: "online",
@@ -360,15 +338,12 @@ app.get("/api/status", (req, res) => {
     connectedClients: connectedClients.size,
   });
 });
-
 app.get("/api/bots", (req, res) => {
   res.json(Array.from(botSessions.values()));
 });
-
 app.get("/api/clients", (req, res) => {
   res.json(Array.from(connectedClients.values()));
 });
-
 app.get("/api/remote-bot/status", (req, res) => {
   const allBots = Array.from(remoteBots.entries()).map(([name, bot]) => ({
     botName: name,
@@ -379,11 +354,8 @@ app.get("/api/remote-bot/status", (req, res) => {
 
   res.json(allBots);
 });
-
 // ============ ЗАПУСК ============
-
 const PORT = process.env.PORT || 3000;
-
 server.listen(PORT, () => {
   console.log(`✓ Сервер запущен на http://localhost:${PORT}`);
   console.log(`✓ Socket.IO слушает на http://localhost:${PORT}`);

@@ -35,7 +35,7 @@ async function renderBots() {
       $("#bot-list").append(`
           <div class="skeleton-striped w-125 h-auto min-h-fit flex items-center flex-row select-none rounded-xl mb-3">
           <div class="h-18 w-18 rounded-full ml-4">
-            <img class="" src="./../images/icon2.png" alt="img got lost =(" />
+            <img class="" src="./../assets/images/main-icon.png" alt="img got lost =(" />
             <p hidden id="${data[i].id}" data-bot-id="${data[i].id}"></p>
           </div>
           <div class="ml-4">
@@ -128,7 +128,7 @@ async function renderBots() {
 }
 // ====== кнопки окна ======
 document.addEventListener("DOMContentLoaded", () => {
-  renderBots();
+  checkAllBots();
 });
 // ============ REMOTE BOT FUNCTIONS ============
 function remote_bot_start(el) {
@@ -277,32 +277,38 @@ function remote_bot_stop(el) {
 // ====== Инициализация socket + обработчики ======
 (async () => {
   const server_ip = await getServerIP();
-  console.log("server_ip:", server_ip);
-
-  socket = io(server_ip); // <-- ГЛОБАЛЬНАЯ переменная
-  function checkAllBots() {
-    console.log("[SOCKET]check-all-bots");
-    socket.emit("check-all-bots");
-  }
+  socket = io(server_ip);
   checkAllBots();
   setInterval(() => {
     checkAllBots();
-  }, 30000);
-  await socket.on("bot-alive-id", async (botId) => {
-    await window.ipc.send("update-bot-status", {
-      botId: botId,
-      status: "active",
-    });
-    console.log("Bot is alive! id:", botId);
+  }, 60000);
 
+  async function checkAllBots() {
+    let arr = [];
     const toast = document.getElementById("toast-notification");
-    toast.textContent = `Список ботов обновлен!`;
-    toast.classList.remove("hidden");
-    renderBots();
+    console.log("[SOCKET]check-all-bots");
+    socket.emit("check-all-bots");
+    socket.on("bot-alive-id", async (botId) => {
+      if (arr.includes(botId) == false) {
+        arr.push(botId);
+      }
+    });
     setTimeout(() => {
-      toast.classList.add("hidden");
-    }, 2000);
-  });
+      console.log(arr);
+      for (let i = 0; i < arr.length; i++) {
+        window.ipc.send("update-bot-status", {
+          botId: arr[i],
+          status: "active",
+        });
+      }
+      renderBots();
+      toast.textContent = `Список ботов обновлен!`;
+      toast.classList.remove("hidden");
+      setTimeout(() => {
+        toast.classList.add("hidden");
+      }, 2000);
+    }, 80);
+  }
   socket.on("bot-register", (data) => {
     console.log("[RENDERER] bot-register", data);
     window.ipc.send("update-bot-status", {
@@ -324,19 +330,6 @@ function remote_bot_stop(el) {
     window.ipc.once("bot-status-updated", () => {});
     renderBots();
   });
-  // socket.emit("AliveBots")
-  // Отправлять отсюда socket.emit("is-bot-alive") каждые N секунд +
-  // На сервере отправлять это в бота
-  // Всем ботам ставить статус Неактивен и потом ставить статус активен только тем у кого статус=Активен
-  // Если ответ от бота есть:
-  //   отправлять его обратно на сервер
-  //   с сервера отправлять результат сюда (id бота,статус=Активен)
-  //     менять боту статус в бд
-  //     renderBots()
-  // Иначе:
-  //  с сервера отправлять ответ о том что бот не запущен
-  //  менять боту статус в бд
-  //  renderBots()
   socket.on("bot-timer-update", (data) => {
     console.log("[RENDERER] bot-timer-update", data);
     console.log($(`${data.botId}`));

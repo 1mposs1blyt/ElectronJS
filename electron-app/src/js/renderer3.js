@@ -53,7 +53,7 @@ async function renderProfile() {
     $("#profile-list").append(`
         <div class="skeleton-striped w-full min-w-110 min-h-32 h-32 flex items-center flex-row select-none rounded-xl mb-3 pt-3 pb-3">
           <div class="h-18 w-18 rounded-full ml-4">
-            <img class="" src="./../images/icon2.png" alt="..." />
+            <img class="" src="./../assets/images/main-icon.png" alt="..." />
           </div>
           <div class="ml-4">
             <div class="text-primary" id="bot-name">${data.name}</div>

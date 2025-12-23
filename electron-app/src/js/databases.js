@@ -35,17 +35,14 @@ async function initializeDatabase() {
         name TEXT,
         username TEXT,
         status TEXT DEFAULT 'inactive',
-        -- SSH данные
         ssh_host TEXT,
         ssh_port INTEGER DEFAULT 22,
         ssh_username TEXT,
         ssh_password TEXT,
         ssh_private_key TEXT,
-        bot_file_name TEXT DEFAULT 'bot.js',
-        -- Пути на сервере
         bot_dir TEXT,
         bot_name TEXT,
-        
+        bot_file_name TEXT DEFAULT 'bot.js',
         FOREIGN KEY (user_id) REFERENCES users(id)
       )
     `);
