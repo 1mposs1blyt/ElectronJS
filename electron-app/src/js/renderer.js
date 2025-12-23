@@ -128,7 +128,7 @@ async function renderBots() {
 }
 // ====== кнопки окна ======
 document.addEventListener("DOMContentLoaded", () => {
-  checkAllBots();
+  renderBots();
 });
 // ============ REMOTE BOT FUNCTIONS ============
 function remote_bot_start(el) {
@@ -286,28 +286,38 @@ function remote_bot_stop(el) {
   async function checkAllBots() {
     let arr = [];
     const toast = document.getElementById("toast-notification");
-    console.log("[SOCKET]check-all-bots");
-    socket.emit("check-all-bots");
-    socket.on("bot-alive-id", async (botId) => {
-      if (arr.includes(botId) == false) {
-        arr.push(botId);
-      }
-    });
-    setTimeout(() => {
-      console.log(arr);
-      for (let i = 0; i < arr.length; i++) {
-        window.ipc.send("update-bot-status", {
-          botId: arr[i],
-          status: "active",
-        });
-      }
-      renderBots();
-      toast.textContent = `Список ботов обновлен!`;
-      toast.classList.remove("hidden");
+    console.log("[SOCKET] check-all-bots");
+    
+    const botIds = await new Promise((resolve) => {
+      const tempArr = [];
+
+      socket.emit("check-all-bots");
+
+      const handler = (botId) => {
+        if (!tempArr.includes(botId)) {
+          tempArr.push(botId);
+        }
+      };
+
+      socket.on("bot-alive-id", handler);
       setTimeout(() => {
-        toast.classList.add("hidden");
-      }, 2000);
-    }, 80);
+        socket.off("bot-alive-id", handler);
+        resolve(tempArr);
+      }, 1500);
+    });
+    console.log(botIds);
+    for (let i = 0; i < botIds.length; i++) {
+      window.ipc.send("update-bot-status", {
+        botId: botIds[i],
+        status: "active",
+      });
+    }
+    renderBots();
+    toast.textContent = `Список ботов обновлен! Активно: ${botIds.length}`;
+    toast.classList.remove("hidden");
+    setTimeout(() => {
+      toast.classList.add("hidden");
+    }, 2000);
   }
   socket.on("bot-register", (data) => {
     console.log("[RENDERER] bot-register", data);
