@@ -66,7 +66,7 @@ const createWindow = () => {
     });
   });
   // if (process.env.NODE_ENV === "development") {
-    win.webContents.openDevTools();
+    // win.webContents.openDevTools();
   // }
   function hideTray() {
     if (tray) {
