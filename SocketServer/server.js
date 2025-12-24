@@ -248,6 +248,14 @@ io.on("connection", async (socket) => {
 
     console.log(`[Bot] Бот зарегистрирован: @${data.username}`);
   });
+  socket.on("error", (data) => {
+    console.error(`[Error] ${data.botName}: ${data.error}`);
+    io.emit("bot-error", {
+      botName: data.botName,
+      error: data.error,
+      timestamp: new Date(),
+    });
+  });
   socket.on("bot-update", (data) => {
     console.log("[SERVER] bot-update", data);
     io.emit("bot-update", data);
@@ -307,14 +315,6 @@ io.on("connection", async (socket) => {
         totalClients: connectedClients.size,
       });
     }
-  });
-  socket.on("error", (data) => {
-    console.error(`[Error] ${data.botName}: ${data.error}`);
-    io.emit("bot-error", {
-      botName: data.botName,
-      error: data.error,
-      timestamp: new Date(),
-    });
   });
 });
 // ============ REST API ============

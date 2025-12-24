@@ -13,6 +13,9 @@ const {
 const bot = new Telegraf(process.env.BOT_TOKEN || "null");
 let BOT_ID;
 const BOT_NAME = process.env.BOT_NAME || "undefined_0";
+// setInterval(async () => {
+//   await isAlive(bot, BOT_NAME);
+// }, 15000);
 // ============ TELEGRAM BOT EVENTS ============
 bot.use(async (ctx, next) => {
   const message = ctx.message?.text || `[${ctx.updateType}]`;
@@ -20,10 +23,11 @@ bot.use(async (ctx, next) => {
   useSockets(ctx, bot, BOT_NAME, message);
   await next();
 });
-setInterval(async () => {
-  await isAlive(bot, BOT_NAME);
-}, 20000);
 
+bot.command("error", (ctx) => {
+  // throw ;
+  socket_error(new Error("Это ошибка без try-catch в обработчике!"), BOT_NAME);
+});
 bot.command("start", (ctx) => {
   ctx.reply(`Привет! Я ${BOT_NAME} 🤖`);
 });

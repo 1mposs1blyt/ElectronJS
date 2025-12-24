@@ -56,9 +56,9 @@ async function appendLog(data) {
   <div>
     <h6 class="text-base">${data.botName}</h6>
     <small class="text-base-content/80 text-xs message">
-    <noscript>
+   <!-- <noscript> -->
         ${data.message ? "Сообщение: " + data.message : "Ошибка: " + data.error}
-    </noscript>
+    <!-- </noscript> --> 
     </small>
   </div>
   <div class="flex flex-col items-center gap-x-2 gap-y-0.5">
@@ -71,7 +71,7 @@ async function appendLog(data) {
 </li>`
     )
     .scrollTop($("#bots-log-list")[0].scrollHeight)
-    .find(".message")
+    .find("#bots-log-list>.message")
     .text(
       `${data.message ? "Сообщение: " + data.message : "Ошибка: " + data.error}`
     );
