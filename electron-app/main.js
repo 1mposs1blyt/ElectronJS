@@ -37,7 +37,7 @@ const createWindow = () => {
     height: windowHeight,
     minWidth: windowWidth,
     minHeight: windowHeight,
-    resizable: false,
+    resizable: true,
     x: x_pos,
     y: y_pos,
     alwaysOnTop: true,
@@ -47,7 +47,8 @@ const createWindow = () => {
       preload: path.join(__dirname, "/src/js/preload.js"),
       contextIsolation: true,
       nodeIntegration: false,
-      // sandbox: true, // ← Рекомендуется добавить
+      webviewTag: false,
+      sandbox: true, // ← Рекомендуется добавить
     },
   });
   win.webContents.session.webRequest.onHeadersReceived((details, callback) => {
@@ -66,7 +67,7 @@ const createWindow = () => {
     });
   });
   // if (process.env.NODE_ENV === "development") {
-  // win.webContents.openDevTools();
+  win.webContents.openDevTools();
   // }
   function hideTray() {
     if (tray) {
@@ -146,6 +147,9 @@ const createWindow = () => {
   });
   ipcMain.on("open-bot-settings-window", (event, data) => {
     win.loadFile(path.join(__dirname, "/pages/bot-settings.html"));
+  });
+  ipcMain.on("open-bot-monit-window", (event, data) => {
+    win.loadFile(path.join(__dirname, "/pages/bot-monit.html"));
   });
   // ========================================================= //
   ipcMain.on("load-all-bots", (event) => {

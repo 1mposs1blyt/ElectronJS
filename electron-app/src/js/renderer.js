@@ -54,8 +54,9 @@ async function renderBots() {
               aria-labelledby="show-hide-collapse_${String(data[i].username)}"
             >
               <div class="text-info">
-                SSH_HOST: <span class="select-text">${data[i].ssh_host}</span>
+                SSH_HOST: <span class="select-text${data[i].ssh_host}</span>
               </div>
+            
               <div class="text-info">
                 SSH_PORT: <span class="select-text">${data[i].ssh_port}</span>
               </div>

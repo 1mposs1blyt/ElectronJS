@@ -27,7 +27,12 @@ document.getElementById("open-settings").addEventListener("click", () => {
 document.getElementById("open-profile").addEventListener("click", () => {
   window.ipc.send("open-profile-window");
 });
-document.getElementById("open-bot-settings").addEventListener("click",()=>{
+document.getElementById("open-bot-settings").addEventListener("click", () => {
   window.ipc.send("open-bot-settings-window");
 });
+document.getElementById("open-bot-monit").addEventListener("click", () => {
+  window.ipc.send("open-bot-monit-window");
+});
 // =================================================================== //
+
+

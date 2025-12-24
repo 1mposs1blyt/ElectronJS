@@ -4,7 +4,6 @@
     <meta charset="UTF-8" />
     <title>Bot manager</title>
     <!--  -->
-    <!-- <link rel="stylesheet" href="./../node_modules/flyonui/flyonui.css" /> -->
     <link rel="stylesheet" href="./../src/css/output.css" />
     <!--  -->
     <!-- <script src="./../node_modules/flyonui/flyonui.js"></script> -->
@@ -23,9 +22,8 @@
     ></script>
     <!-- <script src="./../node_modules/socket.io/client-dist/socket.io.js"></script> -->
     <!--  -->
+    <script src="./../src/js/renderer5.js" defer></script>
     <script src="./../src/js/routes.js" defer></script>
-    <script src="./../src/js/renderer.js" defer></script>
-    <script src="./../src/js/flyonui.js" defer></script>
   </head>
   <body class="overflow-y-hidden select-none">
     <div
@@ -33,7 +31,7 @@
       class="custom-title-bar absolute -top-1 left-0 h-10 w-full pr-0 text-white flex flex-row justify-between items-center select-none"
     >
       <div class="join opt-btns">
-        <button class="btn btn-soft btn-active pt-1" id="home">
+        <button class="btn btn-soft btn-secondary pt-1" id="home">
           <span class="icon-[tabler--home] size-5"></span>
         </button>
         <button class="btn btn-soft btn-secondary pt-1" id="open-settings">
@@ -45,7 +43,7 @@
         <button class="btn btn-soft btn-secondary pt-1" id="open-bot-settings">
           <span class="icon-[tabler--adjustments-horizontal] size-5"></span>
         </button>
-        <button class="btn btn-soft btn-secondary pt-1" id="open-bot-monit">
+        <button class="btn btn-soft btn-active pt-1" id="open-bot-monit">
           <span class="icon-[tabler--message] size-5"></span>
         </button>
       </div>
@@ -71,22 +69,59 @@
       </div>
     </div>
     <div
+      id="bot-settings"
       class="flex items-center flex-col justify-start mt-12 mb-4 h-[92dvh] m-4"
     >
+      <h1 class="flex mb-2 text-primary text-center self-center text-2xl">
+        Мониторинг сообщений:
+      </h1>
       <div
-        class="items-center text-center justify-center flex flex-col align-center mb-4"
-      >
-        <h1 class="text-primary text-center self-center text-2xl">
-          Ваши боты:
-        </h1>
-        <p class="text-secondary text-xl">
-          Используй кнопку настроек для добавления
-        </p>
-      </div>
-      <div
-        id="bot-list"
-        class="w-fit flex items-start justify-start flex-col select-none rounded-xl mb-4 h-auto overflow-y-auto ml-auto mr-auto"
+        hidden
+        id="bot-name-list"
+        class="skeleton-striped w-fit flex items-start justify-start flex-col select-none rounded-xl mb-2 h-86 overflow-y-auto pl-6 pr-6 pt-2 pb-2"
       ></div>
+      <div
+        hidden
+        id="bot-current-edit"
+        class="skeleton-striped w-110 h-auto flex items-start flex-row select-none rounded-xl mb-3 pt-2 pb-2 overflow-y-auto"
+      ></div>
+      <div
+        hidden
+        id="bot-settings-monit"
+        class="w-fit mr-auto ml-auto flex items-start justify-center flex-col select-none rounded-xl mb-4 h-auto pt-3 pb-3"
+      >
+        <div
+          class="skeleton-striped min-w-110 min-h-48 h-auto flex items-center flex-row select-none rounded-xl mb-3"
+        >
+          <div class="flex flex-col w-full items-center">
+            <div class="justify-center mt-2 mb-4 min-w-96" id="bot-name">
+              <span class="text-primary">Имя бота:</span>
+              <input
+                type="text"
+                placeholder="name бота для логирования"
+                class="input max-w-sm"
+                id="bot-monit-name"
+                autocomplete="off"
+              />
+            </div>
+            <div class="justify-center mb-4 min-w-96">
+              <button
+                type="button"
+                id="bot-monit"
+                class="btn btn-soft btn-primary w-full max-w-sm mb-3"
+              >
+                Смотреть!
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="card  w-130 h-full overflow-y-auto mb-4 skeleton-striped">
+        <div class="text-base-content/50 px-4 py-2 text-sm font-medium">
+          OUTPUT FROM BOTS
+        </div>
+        <ul class="space-y-0.5 h-auto overflow-y-scroll" id="bots-log-list"></ul>
+      </div>
     </div>
     <div
       id="toast-notification"

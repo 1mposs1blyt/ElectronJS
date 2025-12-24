@@ -45,7 +45,6 @@ function BotEditSave() {
     renderBotNames();
   });
 }
-
 async function renderBotEditingList(botname) {
   try {
     const data = await window.ipc.invoke("load-all-bots"); // ЖДЁМ данные
